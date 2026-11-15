@@ -18,28 +18,30 @@ GTA 6 sort le 19 novembre 2026 ! Avant de lancer ta partie, Sunny repasse les de
 
 ⏱️ Chapitres
 0:00 Le détail que tout le monde a raté
-0:20 Bienvenue sur Leonida Live
-0:45 15 – Un record historique
-1:15 14 – Bienvenue à Leonida
-1:45 13 – Les 6 régions
-2:25 12 – Lucia en prison
-2:55 11 – Le passé de Jason
-3:20 10 – Le duo Bonnie & Clyde
-3:50 9 – Les réseaux sociaux du jeu
-4:30 8 – Les personnages secondaires
-5:05 7 – La musique des trailers
-5:35 6 – Les foules
-6:05 5 – Les détails techniques
-6:35 4 – Les véhicules
-7:05 3 – Les animaux
-7:35 2 – Le retour de Vice City
-8:05 1 – LE détail caché
-8:40 Le défi de Sunny
+0:17 Bienvenue sur Leonida Live
+0:56 15 – Un record historique
+1:20 14 – Bienvenue à Leonida
+1:44 13 – Les 6 régions
+2:21 12 – Lucia en prison
+2:44 11 – Le passé de Jason
+3:17 10 – Le duo Bonnie & Clyde
+3:39 9 – Les réseaux sociaux du jeu
+4:01 Flash spécial Leonida
+4:32 8 – Les personnages secondaires
+5:00 7 – La musique des trailers
+5:36 Le saviez-vous ? 10 ans d'attente
+6:01 6 – Les foules
+6:30 5 – Les détails techniques
+6:55 4 – Les véhicules
+7:24 3 – Les animaux
+7:53 2 – Le retour de Vice City
+8:18 1 – LE détail caché
+8:45 Le défi de Sunny
 
 🔔 Abonne-toi : une vidéo par jour à 18 h dès la sortie (secrets, véhicules rares, lieux cachés).
 💬 Trouve le 16e détail en commentaire !
 
-Vidéo de fan non affiliée à Rockstar Games ni Take-Two Interactive. Grand Theft Auto et GTA sont des marques de Take-Two Interactive. Extraits des trailers officiels utilisés à des fins de commentaire.
+Vidéo de fan non affiliée à Rockstar Games ni Take-Two Interactive. Grand Theft Auto et GTA sont des marques de Take-Two Interactive. Extraits des trailers officiels utilisés à des fins de commentaire. Sunny est un personnage virtuel : avatar et voix générés par IA.
 
 #GTA6 #GTAVI #Leonida
 ```

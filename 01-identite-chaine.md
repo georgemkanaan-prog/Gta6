@@ -23,17 +23,13 @@
   - Réaction : « Non mais LEONIDA, quoi. »
   - Clôture : « Restez au soleil, restez discrets. C'était Sunny, à demain sur Leonida Live. »
 
-### Comment produire Sunny (3 options)
-| Option | Coût | Avantages | Points d'attention |
-|---|---|---|---|
-| **A. Comédienne réelle** sur fond vert | 50–150 €/vidéo | Le plus crédible, meilleure rétention | Contrat de cession de droit à l'image |
-| **B. Avatar IA** (HeyGen, Synthesia, D-ID…) | 30–90 €/mois | Rapide, une vidéo/jour possible | **Cocher « contenu modifié/synthétique »** à l'upload (règle YouTube) ; choisir un avatar sous licence commerciale |
-| **C. VTuber 2D/3D** (VTube Studio + voix) | ~100 € une fois | Style unique, mascotte forte | Il faut une voix humaine ou une voix IA sous licence |
-
-**Recommandation** : démarrer en **B** pour sortir la vidéo n°1 cette semaine, passer en A ou C si la chaîne décolle.
+### Comment produire Sunny
+**Choix retenu : avatar 3D semi-réaliste, qualité « personnage de jeu vidéo AAA »** (ni dessin animé,
+ni photo réelle) + **voix féminine IA, enjouée et drôle**. Toute la procédure (prompts, outils,
+réglages de voix) est dans **[05-production-sunny.md](05-production-sunny.md)**.
 
 ## Habillage
-- **Avatar** : buste de Sunny en dessin, fond coucher de soleil rose/orange.
+- **Avatar** : buste de Sunny (rendu 3D semi-réaliste, même image de référence que l'avatar vidéo), fond coucher de soleil rose/orange.
 - **Bannière** (2560×1440, zone sûre 1546×423) : skyline de nuit, Sunny à gauche, texte
   « LEONIDA LIVE — secrets, missions, véhicules rares de GTA 6 · Nouvelle vidéo tous les jours à 18 h ».
 - **Générique** : 4 secondes max (jingle synthwave libre de droits + logo Leonida Live).
