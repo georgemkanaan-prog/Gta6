@@ -18,6 +18,12 @@
 > personnages à partir de zéro. La voix et l'animation seront aussi faites ici : les sections ci-dessous
 > sur ElevenLabs et HeyGen ne sont plus utilisées.
 
+> **Voix (18/11)** — générées en local avec Chatterbox multilingue (licence MIT) :
+> - **Sunny** = `voix/echantillons/sunny.mp3` (préréglage `sunny`), **Vicky** = `voix/echantillons/vicky.mp3` (préréglage `vicky`).
+> - `python voix/generer_voix.py --texte segment.txt --voix sunny --sortie segment.wav` : chaque phrase est
+>   générée en plusieurs prises, la plus fidèle au texte (vérifiée par transcription Whisper) est gardée.
+> - Les noms anglais sont réécrits phonétiquement par `voix/prononciation.py` (à enrichir au besoin).
+
 **Objectif visuel** : Sunny doit ressembler à un **personnage d'un jeu en monde ouvert récent** :
 rendu 3D réaliste (peau, cheveux, éclairage), mais légèrement stylisé (traits un peu accentués,
 couleurs saturées). Elle doit avoir l'air de pouvoir sortir du jeu, **sans copier un personnage

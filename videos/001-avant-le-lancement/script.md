@@ -18,7 +18,7 @@
 ## 0:13 — GÉNÉRIQUE (4 s)
 
 ## 0:17 — ANNONCE
-`[S]` Bonjour Leonida, ici Sunny, et il fait beau sur Vice City… enfin, sauf pour la police. Bienvenue sur Leonida Live, la toute première émission de la chaîne ! Le 19 novembre, GTA 6 sort enfin. Il reste quelques jours. Alors avant de lancer ta partie, on va repasser les deux trailers au peigne fin : quinze détails, du plus discret au plus fou. Et reste jusqu'au bout : le numéro un, je l'ai trouvé en mettant le trailer sur pause image par image, et franchement, j'ai crié. Installe-toi, prends un jus d'orange de Leonida, sans glaçons volés de préférence. Régie, envoyez !
+`[S]` Bonjour Leonida, ici Sunny, et il fait beau sur Vice City… enfin, sauf pour la police. Bienvenue sur Leonida Live, la toute première émission de la chaîne ! Le 19 novembre, GTA 6 sort enfin, et le compte à rebours est presque terminé ! Alors avant de lancer ta partie, on va repasser les deux trailers au peigne fin : quinze détails, du plus discret au plus fou. Et reste jusqu'au bout : le numéro un, je l'ai trouvé en mettant le trailer sur pause image par image, et franchement, j'ai crié. Installe-toi, prends un jus d'orange de Leonida, sans glaçons volés de préférence. Régie, envoyez !
 
 ## 0:56 — N°15 · Le record
 `[TV] Ouverture du Trailer 1` `[TXT] ~90 millions de vues en 24 h`

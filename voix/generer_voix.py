@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Génère la voix d'une présentatrice avec Chatterbox multilingue (licence MIT, usage commercial OK).
 
-    python generer_voix.py --texte texte_demo.txt --voix voix1 --sortie demo_voix1.wav
+    python generer_voix.py --texte texte_demo.txt --voix sunny --sortie demo_sunny.wav
 
 Les voix sont définies dans VOIX : un extrait de référence (timbre cloné) + des réglages d'expressivité.
 Le texte est découpé en phrases (Chatterbox gère mal les textes longs), puis recollé avec de courtes pauses.
@@ -24,6 +24,9 @@ from prononciation import prononcer  # noqa: E402
 
 VOIX = {
     # exaggeration : 0.5 = neutre, 0.8+ = très expressif ; cfg_weight bas = débit plus rapide et vivant
+    # Choix validés le 18/11 : Sunny = option A (timbre « sara »), Vicky = voix 1
+    "sunny": {"reference": ICI / "references" / "if_sara.wav", "exaggeration": 0.8, "cfg_weight": 0.35, "temperature": 0.8},
+    "vicky": {"reference": ICI / "references" / "voix1.wav", "exaggeration": 0.75, "cfg_weight": 0.35, "temperature": 0.8},
     "voix1": {"reference": ICI / "references" / "voix1.wav", "exaggeration": 0.75, "cfg_weight": 0.35, "temperature": 0.8},
     "sara": {"reference": ICI / "references" / "if_sara.wav", "exaggeration": 0.8, "cfg_weight": 0.35, "temperature": 0.8},
     "heart": {"reference": ICI / "references" / "af_heart.wav", "exaggeration": 0.8, "cfg_weight": 0.35, "temperature": 0.8},

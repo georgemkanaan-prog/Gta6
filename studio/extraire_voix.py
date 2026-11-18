@@ -19,7 +19,7 @@ def pour_la_voix(t: str) -> str:
     t = re.sub(r"[✔🔮⚠️☀]", "", t)
     t = re.sub(r"\bn°\s*(\d+)", lambda m: "numéro " + NOMBRES.get(int(m.group(1)), m.group(1)), t, flags=re.I)
     t = re.sub(r"(\d+)ᵉ", r"\1e", t)
-    t = t.replace("GTA 6", "G T A six").replace("PS5", "PS cinq").replace("~", "environ ")
+    t = t.replace("GTA 6", "GTA six").replace("PS5", "PS cinq").replace("~", "environ ")
     t = re.sub(r"\bLEONIDA\b", "Leonida !", t)                       # cri de surprise, pas d'épellation
     t = re.sub(r"\s+", " ", t).strip()
     return t
