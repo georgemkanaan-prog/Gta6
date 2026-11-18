@@ -15,6 +15,7 @@
 #   -g  la vidéo de Sunny est tournée sur fond vert (active l'incrustation chroma key)
 #   -z  recadrage zoomé : ne garde que le centre de l'extrait (0.75 = 75 % de la largeur et de la hauteur)
 #   -k  crédit affiché dans la télé (obligatoire pour un clip qui ne vient pas de Rockstar)
+#   -m  masque PNG (blanc = Sunny) pour détourer une vidéo animée de Sunny
 set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -23,16 +24,16 @@ BG="$DIR/assets/studio.png"
 TV_X=820; TV_Y=150; TV_W=960; TV_H=540
 FONT="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
-CLIP=""; OUT=""; PRES=""; TITLE=""; START=0; DUR=""; VOL=0.25; GREEN=0; ZOOM=1; CREDIT=""
-while getopts "c:o:p:t:s:d:v:gz:k:" opt; do
+CLIP=""; OUT=""; PRES=""; TITLE=""; START=0; DUR=""; VOL=0.25; GREEN=0; ZOOM=1; CREDIT=""; MASK=""
+while getopts "c:o:p:t:s:d:v:gz:k:m:" opt; do
   case $opt in
     c) CLIP=$OPTARG ;; o) OUT=$OPTARG ;; p) PRES=$OPTARG ;; t) TITLE=$OPTARG ;;
     s) START=$OPTARG ;; d) DUR=$OPTARG ;; v) VOL=$OPTARG ;; g) GREEN=1 ;;
-    z) ZOOM=$OPTARG ;; k) CREDIT=$OPTARG ;;
-    *) sed -n '2,19p' "$0"; exit 1 ;;
+    z) ZOOM=$OPTARG ;; k) CREDIT=$OPTARG ;; m) MASK=$OPTARG ;;
+    *) sed -n '2,20p' "$0"; exit 1 ;;
   esac
 done
-[[ -n $CLIP && -n $OUT ]] || { sed -n '2,19p' "$0"; exit 1; }
+[[ -n $CLIP && -n $OUT ]] || { sed -n '2,20p' "$0"; exit 1; }
 [[ -f $BG ]] || python3 "$DIR/generer_decor.py"
 
 DUR_OPT=(); [[ -n $DUR ]] && DUR_OPT=(-t "$DUR")
@@ -54,11 +55,17 @@ AUDIO_SRC=()
 if [[ -n $PRES ]]; then
   case "${PRES,,}" in
     *.png|*.webp) INPUTS+=(-loop 1 -i "$PRES") ;;
-    *)            INPUTS+=(-stream_loop -1 -i "$PRES") ;;
+    *)            INPUTS+=(-i "$PRES") ;;   # vidéo animée : lue une fois, la dernière image est gardée
   esac
   KEY=""; [[ $GREEN == 1 ]] && KEY="colorkey=0x00FF00:0.30:0.10,"
-  FILTER+="[2:v]${KEY}scale=-1:820,format=rgba[sunny];"
-  FILTER+="[${LAST}][sunny]overlay=60:H-h-20:shortest=0:eof_action=pass[v2];"
+  if [[ -n $MASK ]]; then   # détourage par masque fixe (avatar animé en mode « still » : la tête bouge peu)
+    INPUTS+=(-loop 1 -i "$MASK")
+    FILTER+="[3:v]format=gray[msk];[2:v]fps=30[pv];[pv][msk]alphamerge,"
+  else
+    FILTER+="[2:v]fps=30,${KEY}"
+  fi
+  FILTER+="scale=-1:820,format=rgba[sunny];"
+  FILTER+="[${LAST}][sunny]overlay=60:H-h-20:shortest=0:eof_action=repeat[v2];"
   LAST="v2"
   has_audio "$PRES" && AUDIO_SRC+=("[2:a]volume=1.0[a_s]")
 fi
@@ -84,8 +91,11 @@ elif ((${#A_PARTS[@]} == 1)); then
 fi
 FILTER=${FILTER%;}
 
+# durée de sortie explicite : les images fixes en boucle (décor, masque) ne doivent pas prolonger la vidéo
+if [[ -n $DUR ]]; then T_OUT=$DUR
+else T_OUT=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$CLIP"); T_OUT=$(python3 -c "print(max(0.1, $T_OUT - $START))"); fi
 ffmpeg -hide_banner -loglevel warning -y "${INPUTS[@]}" \
   -filter_complex "$FILTER" -map "[$LAST]" "${MAP_A[@]}" \
-  -shortest -r 30 -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p \
+  -t "$T_OUT" -r 30 -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p \
   -c:a aac -b:a 192k -movflags +faststart "$OUT"
 echo "Segment créé : $OUT"

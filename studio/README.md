@@ -39,3 +39,15 @@ musique libre de droits. Ou en ligne de commande :
 printf "file '%s'\n" seg_*.mp4 > liste.txt
 ffmpeg -f concat -safe 0 -i liste.txt -c copy video_finale.mp4
 ```
+
+## 4. Animer Sunny (lèvres synchronisées)
+SadTalker (licence Apache 2.0), sur CPU : ~13 min de calcul pour 8 s de vidéo.
+```bash
+python inference.py --driven_audio voix.wav --source_image studio/avatar/sunny.png \
+    --result_dir sortie --still --preprocess full --size 256 --cpu
+./studio/monter_segment.sh -c extrait.mp4 -p sortie/<video>.mp4 -m masque_sunny.png -t "Titre" -d 8 -v 0 -o seg.mp4
+```
+- Avec NumPy 2, trois corrections sont nécessaires dans SadTalker (`np.VisibleDeprecationWarning` →
+  `np.exceptions.…`, `float(tableau)` → `np.asarray(…).item()` dans `src/face3d/util/preprocess.py` et
+  `src/utils/preprocess.py`, `np.float` → `np.float64`) ; GFPGAN (amélioration du visage) est optionnel.
+- `masque_sunny.png` : détourage de `sunny.png` (rembg, modèle `u2net_human_seg`), réutilisé sur toutes les images.
