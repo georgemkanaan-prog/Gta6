@@ -5,3 +5,5 @@
 rushes/
 exports/
 __pycache__/
+!voix/references/*.wav
+!voix/echantillons/*.mp3
