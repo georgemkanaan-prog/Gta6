@@ -25,11 +25,9 @@ from prononciation import prononcer  # noqa: E402
 VOIX = {
     # exaggeration : 0.5 = neutre, 0.8+ = très expressif ; cfg_weight bas = débit plus rapide et vivant
     "voix1": {"reference": ICI / "references" / "voix1.wav", "exaggeration": 0.75, "cfg_weight": 0.35, "temperature": 0.8},
-    # voix 2 : voix intégrée de Chatterbox (enregistrement humain), plus naturelle qu'une référence transposée
-    "voix2": {"reference": None, "exaggeration": 0.8, "cfg_weight": 0.35, "temperature": 0.8},
-    "defaut": {"reference": None, "exaggeration": 0.75, "cfg_weight": 0.35, "temperature": 0.8},
-    # voix intégrée de Chatterbox (enregistrement humain), version très expressive
-    "defaut_fun": {"reference": None, "exaggeration": 0.95, "cfg_weight": 0.3, "temperature": 0.85},
+    "sara": {"reference": ICI / "references" / "if_sara.wav", "exaggeration": 0.8, "cfg_weight": 0.35, "temperature": 0.8},
+    "heart": {"reference": ICI / "references" / "af_heart.wav", "exaggeration": 0.8, "cfg_weight": 0.35, "temperature": 0.8},
+    # NB : la voix intégrée de Chatterbox (sans référence) est MASCULINE : ne pas l'utiliser.
 }
 
 
