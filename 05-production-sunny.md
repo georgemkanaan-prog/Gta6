@@ -10,7 +10,8 @@
 > ```bash
 > cd studio/avatar
 > python retoucher.py vicky.png etape1.png --haut-blanc --graine 5           # haut blanc + cheveux blonds lisses
-> python retoucher.py etape1.png sunny.png --buste --force 0.65 --graine 4   # buste un peu plus important
+> python retoucher.py etape1.png etape2.png --buste --force 0.65 --graine 4  # nettoyage du haut
+> python gonfler.py etape2.png sunny.png --force 0.5 --rayon 260 --centres 285,1040 575,1040  # volume du buste
 > ```
 > Prérequis : `pip install torch diffusers transformers accelerate safetensors pillow rembg onnxruntime scipy`,
 > et l'accès réseau à huggingface.co (environnement « Gta6 »). `generer_sunny.py` crée de nouveaux
