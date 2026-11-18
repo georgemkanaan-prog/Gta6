@@ -14,8 +14,7 @@
   puis casse le quatrième mur avec des blagues de joueuse.
 - **Personnalité** : solaire, rapide, un peu moqueuse, jamais méchante. Fan absolue mais lucide.
   Elle a un running gag : elle déteste la police de Leonida et adore les alligators.
-- **Look** : tailleur rose fuchsia ou turquoise façon années 80 revisitées, lunettes de soleil sur
-  la tête, micro doré. Palette : rose néon `#FF3E9A`, turquoise `#21D4E0`, orange coucher de soleil `#FF8A3D`, violet nuit `#2A0F4A`.
+- **Look** : blonde platine aux cheveux ondulés, blazer rose satiné façon années 80, créoles dorées, micro doré. Palette : rose néon `#FF3E9A`, turquoise `#21D4E0`, orange coucher de soleil `#FF8A3D`, violet nuit `#2A0F4A`.
 - **Voix** : débit rapide, phrases courtes, tutoiement du public (« toi qui regardes… »).
 - **Phrases fétiches** (à placer 1 à 2 fois par vidéo, pas plus) :
   - Ouverture : « Bonjour Leonida, ici Sunny, et il fait beau sur Vice City… enfin, sauf pour la police. »
@@ -23,10 +22,17 @@
   - Réaction : « Non mais LEONIDA, quoi. »
   - Clôture : « Restez au soleil, restez discrets. C'était Sunny, à demain sur Leonida Live. »
 
-### Comment produire Sunny
-**Choix retenu : avatar 3D semi-réaliste, qualité « personnage de jeu vidéo AAA »** (ni dessin animé,
-ni photo réelle) + **voix féminine IA, enjouée et drôle**. Toute la procédure (prompts, outils,
-réglages de voix) est dans **[05-production-sunny.md](05-production-sunny.md)**.
+### Vicky, la co-présentatrice
+- **Qui** : la « reporter terrain » de Leonida Live, toujours dehors dans les néons de Vice City.
+  Plus pince-sans-rire que Sunny, elle joue la cynique qui a tout vu (« À Leonida, rien ne me surprend. Enfin presque. »).
+- **Look** : cheveux châtains ondulés aux pointes roses, blazer rose satiné, créoles dorées.
+- **Alternance** : une vidéo sur deux est présentée par Vicky ; dans les « Unes de la semaine », les deux se donnent la réplique.
+- Phrase fétiche : « Ici Vicky, en direct de la rue. Et la rue, elle a des choses à te dire. »
+
+### Production des présentatrices
+Avatars 3D semi-réalistes (qualité jeu vidéo) générés **dans ce projet** : portraits validés dans
+`studio/avatar/` (`sunny_studio_g11.png`, `vicky_studio_g11.png`), script `studio/avatar/generer_sunny.py`.
+Détails : [05-production-sunny.md](05-production-sunny.md).
 
 ## Habillage
 - **Avatar** : buste de Sunny (rendu 3D semi-réaliste, même image de référence que l'avatar vidéo), fond coucher de soleil rose/orange.

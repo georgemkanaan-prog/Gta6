@@ -1,5 +1,18 @@
 # Production de Sunny : avatar 3D semi-réaliste + voix
 
+> **Mise à jour du 18/11 — tout est fait dans ce projet, sans service externe.**
+> Portraits validés : **Sunny** (blonde) et **Vicky** (co-présentatrice) dans `studio/avatar/`.
+> Ils sont générés en local par `studio/avatar/generer_sunny.py` (modèle DreamShaper XL Lightning,
+> licence Open RAIL++-M : usage commercial autorisé). Même présentatrice + même graine = même image :
+> ```bash
+> python studio/avatar/generer_sunny.py vicky              # proposition A validée
+> python studio/avatar/generer_sunny.py sunny              # dérivée de Vicky : blonde
+> python studio/avatar/generer_sunny.py sunny --fond vert  # version fond vert pour l'incrustation
+> ```
+> Prérequis : `pip install torch diffusers transformers accelerate safetensors pillow` et accès réseau à
+> huggingface.co (environnement « Gta6 »). La voix et l'animation (lèvres synchronisées) seront aussi
+> faites ici : les sections ci-dessous sur ElevenLabs/HeyGen ne sont plus utilisées.
+
 **Objectif visuel** : Sunny doit ressembler à un **personnage d'un jeu en monde ouvert récent** :
 rendu 3D réaliste (peau, cheveux, éclairage), mais légèrement stylisé (traits un peu accentués,
 couleurs saturées). Elle doit avoir l'air de pouvoir sortir du jeu, **sans copier un personnage
