@@ -30,16 +30,16 @@ NEGATIF = ("wavy hair, curly hair, brown hair, dark hair, pink hair, dark roots,
 VISAGE = (300, 175, 600, 545)
 
 
-PROMPT_BUSTE = ("3d video game character, unreal engine 5 render, woman wearing a white deep v-neck halter top "
-                "with wide straps, large full bust, cleavage, long straight platinum blonde hair")
-NEGATIF_BUSTE = "wavy hair, small bust, flat chest, pink top, nude, nsfw, deformed, bad anatomy, cartoon, blurry"
+PROMPT_BUSTE = ("3d video game character, unreal engine 5 render, voluptuous woman, round full perky bust, "
+                "deep cleavage, white deep v-neck halter top with wide straps, long straight platinum blonde hair")
+NEGATIF_BUSTE = "wavy hair, small bust, saggy, nipples, see-through, flat chest, pink top, nude, nsfw, deformed, bad anatomy, cartoon, blurry"
 
 
 def masque_buste(img: Image.Image) -> Image.Image:
     """Zone du torse uniquement (sous le menton), dans la silhouette de la personne."""
     personne = remove(img, session=new_session("u2net_human_seg"), only_mask=True)
     m = np.array(personne.filter(ImageFilter.MaxFilter(41))) > 128
-    m[: int(img.height * 0.58)] = False
+    m[: int(img.height * 0.70)] = False  # sous les clavicules : épaules et cou intacts
     return Image.fromarray((m * 255).astype("uint8")).filter(ImageFilter.GaussianBlur(16))
 
 
