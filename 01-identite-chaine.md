@@ -14,7 +14,7 @@
   puis casse le quatrième mur avec des blagues de joueuse.
 - **Personnalité** : solaire, rapide, un peu moqueuse, jamais méchante. Fan absolue mais lucide.
   Elle a un running gag : elle déteste la police de Leonida et adore les alligators.
-- **Look** : blonde platine aux cheveux ondulés, blazer rose satiné façon années 80, créoles dorées, micro doré. Palette : rose néon `#FF3E9A`, turquoise `#21D4E0`, orange coucher de soleil `#FF8A3D`, violet nuit `#2A0F4A`.
+- **Look** : longs cheveux blond platine lisses, haut blanc à col V et larges bretelles, boucles d'oreilles roses, micro doré. Palette : rose néon `#FF3E9A`, turquoise `#21D4E0`, orange coucher de soleil `#FF8A3D`, violet nuit `#2A0F4A`.
 - **Voix** : débit rapide, phrases courtes, tutoiement du public (« toi qui regardes… »).
 - **Phrases fétiches** (à placer 1 à 2 fois par vidéo, pas plus) :
   - Ouverture : « Bonjour Leonida, ici Sunny, et il fait beau sur Vice City… enfin, sauf pour la police. »
@@ -25,13 +25,13 @@
 ### Vicky, la co-présentatrice
 - **Qui** : la « reporter terrain » de Leonida Live, toujours dehors dans les néons de Vice City.
   Plus pince-sans-rire que Sunny, elle joue la cynique qui a tout vu (« À Leonida, rien ne me surprend. Enfin presque. »).
-- **Look** : cheveux châtains ondulés aux pointes roses, blazer rose satiné, créoles dorées.
+- **Look** : longs cheveux châtains ondulés avec mèches roses, haut rose à col V, taches de rousseur.
 - **Alternance** : une vidéo sur deux est présentée par Vicky ; dans les « Unes de la semaine », les deux se donnent la réplique.
 - Phrase fétiche : « Ici Vicky, en direct de la rue. Et la rue, elle a des choses à te dire. »
 
 ### Production des présentatrices
 Avatars 3D semi-réalistes (qualité jeu vidéo) générés **dans ce projet** : portraits validés dans
-`studio/avatar/` (`sunny_studio_g11.png`, `vicky_studio_g11.png`), script `studio/avatar/generer_sunny.py`.
+`studio/avatar/` (`sunny.png`, `vicky.png`, planche `presentatrices.png`). Sunny est dérivée de Vicky avec `studio/avatar/retoucher.py`.
 Détails : [05-production-sunny.md](05-production-sunny.md).
 
 ## Habillage

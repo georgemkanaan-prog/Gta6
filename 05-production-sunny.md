@@ -1,17 +1,21 @@
 # Production de Sunny : avatar 3D semi-réaliste + voix
 
 > **Mise à jour du 18/11 — tout est fait dans ce projet, sans service externe.**
-> Portraits validés : **Sunny** (blonde) et **Vicky** (co-présentatrice) dans `studio/avatar/`.
-> Ils sont générés en local par `studio/avatar/generer_sunny.py` (modèle DreamShaper XL Lightning,
-> licence Open RAIL++-M : usage commercial autorisé). Même présentatrice + même graine = même image :
+> Portraits validés dans `studio/avatar/` :
+> - **Vicky** (`vicky.png`) : image retenue, cheveux châtains ondulés à mèches roses, haut rose.
+> - **Sunny** (`sunny.png`) : dérivée de Vicky en gardant son visage et le décor. Cheveux longs blond platine
+>   lisses, même haut en blanc, buste un peu plus important.
+>
+> Pour refaire Sunny (retouche locale avec le modèle DreamShaper XL Lightning, licence Open RAIL++-M) :
 > ```bash
-> python studio/avatar/generer_sunny.py vicky              # proposition A validée
-> python studio/avatar/generer_sunny.py sunny              # dérivée de Vicky : blonde
-> python studio/avatar/generer_sunny.py sunny --fond vert  # version fond vert pour l'incrustation
+> cd studio/avatar
+> python retoucher.py vicky.png etape1.png --haut-blanc --graine 5           # haut blanc + cheveux blonds lisses
+> python retoucher.py etape1.png sunny.png --buste --force 0.65 --graine 4   # buste un peu plus important
 > ```
-> Prérequis : `pip install torch diffusers transformers accelerate safetensors pillow` et accès réseau à
-> huggingface.co (environnement « Gta6 »). La voix et l'animation (lèvres synchronisées) seront aussi
-> faites ici : les sections ci-dessous sur ElevenLabs/HeyGen ne sont plus utilisées.
+> Prérequis : `pip install torch diffusers transformers accelerate safetensors pillow rembg onnxruntime scipy`,
+> et l'accès réseau à huggingface.co (environnement « Gta6 »). `generer_sunny.py` crée de nouveaux
+> personnages à partir de zéro. La voix et l'animation seront aussi faites ici : les sections ci-dessous
+> sur ElevenLabs et HeyGen ne sont plus utilisées.
 
 **Objectif visuel** : Sunny doit ressembler à un **personnage d'un jeu en monde ouvert récent** :
 rendu 3D réaliste (peau, cheveux, éclairage), mais légèrement stylisé (traits un peu accentués,
