@@ -13,6 +13,12 @@ refus de monétisation pour **« contenu réutilisé »**. Voici comment garder 
    (« Clip : @pseudo ») et lien en description. Beaucoup acceptent en échange du crédit.
 4. **Captures d'écran de posts** (Reddit/X) pour citer une découverte, avec crédit.
 
+### Mise en scène des extraits (règle de la chaîne)
+- Rockstar : extrait tel quel. Autre créateur : extrait de quelques secondes, **recadré au centre (≈ 75 %)** dans la télé,
+  **crédité à l'écran** (« Clip : @pseudo ») et en description.
+- ⚠️ Le recadrage ne rend pas un clip « libre » : Content ID reconnaît aussi les images recadrées, et masquer le
+  logo/pseudo d'un créateur aggrave le cas en cas de réclamation. On garde donc toujours l'accord + le crédit.
+
 ## Ce qui est risqué / interdit
 - Reprendre des vidéos entières ou de longs passages d'autres youtubeurs sans accord.
 - Une vidéo composée surtout de clips d'autres personnes, même avec commentaire : refus YPP probable.

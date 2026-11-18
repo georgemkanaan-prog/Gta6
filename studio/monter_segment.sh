@@ -3,7 +3,7 @@
 #
 # Usage :
 #   ./monter_segment.sh -c extrait.mp4 -o sortie.mp4 [-p sunny.mp4|sunny.png] [-t "N°12 — Lucia en prison"]
-#                       [-s debut_sec] [-d duree_sec] [-v volume_extrait] [-g]
+#                       [-s debut_sec] [-d duree_sec] [-v volume_extrait] [-g] [-z 0.75] [-k "Clip : @pseudo"]
 #
 #   -c  extrait à afficher dans la télé (obligatoire)
 #   -o  fichier de sortie (obligatoire)
@@ -13,6 +13,8 @@
 #   -d  durée du segment en secondes (défaut : durée de l'extrait)
 #   -v  volume de l'extrait sous la voix de Sunny (défaut 0.25)
 #   -g  la vidéo de Sunny est tournée sur fond vert (active l'incrustation chroma key)
+#   -z  recadrage zoomé : ne garde que le centre de l'extrait (0.75 = 75 % de la largeur et de la hauteur)
+#   -k  crédit affiché dans la télé (obligatoire pour un clip qui ne vient pas de Rockstar)
 set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -21,15 +23,16 @@ BG="$DIR/assets/studio.png"
 TV_X=820; TV_Y=150; TV_W=960; TV_H=540
 FONT="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
-CLIP=""; OUT=""; PRES=""; TITLE=""; START=0; DUR=""; VOL=0.25; GREEN=0
-while getopts "c:o:p:t:s:d:v:g" opt; do
+CLIP=""; OUT=""; PRES=""; TITLE=""; START=0; DUR=""; VOL=0.25; GREEN=0; ZOOM=1; CREDIT=""
+while getopts "c:o:p:t:s:d:v:gz:k:" opt; do
   case $opt in
     c) CLIP=$OPTARG ;; o) OUT=$OPTARG ;; p) PRES=$OPTARG ;; t) TITLE=$OPTARG ;;
     s) START=$OPTARG ;; d) DUR=$OPTARG ;; v) VOL=$OPTARG ;; g) GREEN=1 ;;
-    *) sed -n '2,17p' "$0"; exit 1 ;;
+    z) ZOOM=$OPTARG ;; k) CREDIT=$OPTARG ;;
+    *) sed -n '2,19p' "$0"; exit 1 ;;
   esac
 done
-[[ -n $CLIP && -n $OUT ]] || { sed -n '2,17p' "$0"; exit 1; }
+[[ -n $CLIP && -n $OUT ]] || { sed -n '2,19p' "$0"; exit 1; }
 [[ -f $BG ]] || python3 "$DIR/generer_decor.py"
 
 DUR_OPT=(); [[ -n $DUR ]] && DUR_OPT=(-t "$DUR")
@@ -37,7 +40,13 @@ has_audio() { ffprobe -v error -select_streams a -show_entries stream=index -of 
 
 INPUTS=(-loop 1 -i "$BG" -ss "$START" "${DUR_OPT[@]}" -i "$CLIP")
 # Extrait : mis à l'échelle et centré dans l'écran de la télé, léger effet « écran » (vignette)
-FILTER="[1:v]scale=${TV_W}:${TV_H}:force_original_aspect_ratio=decrease,pad=${TV_W}:${TV_H}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,vignette=PI/6[tv];"
+CROP=""; [[ $ZOOM != 1 ]] && CROP="crop=iw*${ZOOM}:ih*${ZOOM}:(iw-iw*${ZOOM})/2:(ih-ih*${ZOOM})/2,"
+FILTER="[1:v]${CROP}scale=${TV_W}:${TV_H}:force_original_aspect_ratio=decrease,pad=${TV_W}:${TV_H}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,vignette=PI/6"
+if [[ -n $CREDIT ]]; then
+  C=${CREDIT//\\/\\\\}; C=${C//:/\\:}; C=${C//\'/\\\'}
+  FILTER+=",drawtext=fontfile=${FONT}:text='${C}':fontcolor=white:fontsize=24:x=w-tw-24:y=h-44:box=1:boxcolor=black@0.6:boxborderw=8"
+fi
+FILTER+="[tv];"
 FILTER+="[0:v][tv]overlay=${TV_X}:${TV_Y}:shortest=1[v1];"
 LAST="v1"
 

@@ -22,6 +22,15 @@ de la télé à x=820, y=150, 960×540 (ou changer `TV_*` dans les deux scripts)
 - Son : la voix de Sunny à 100 %, l'extrait à 25 % (`-v 0.4` pour l'augmenter).
 - `-p` accepte aussi une image PNG transparente de Sunny (avatar fixe ou VTuber exporté).
 
+### Extraits : règle de la chaîne
+- **Trailers et vidéos officielles Rockstar** : extrait tel quel, quelques secondes.
+- **Clip d'un autre créateur** : recadré au centre (`-z 0.75`, on ne voit pas les bords) **et** crédité à l'écran (`-k`).
+  ```bash
+  ./studio/monter_segment.sh -c clip_joueur.mp4 -s 12 -d 6 -z 0.75 -k "Clip : @pseudo" \
+      -p sunny_anim.mp4 -t "N°7 — Le motel caché" -o seg_07.mp4
+  ```
+  Le recadrage est un choix de mise en scène ; il ne remplace pas l'accord du créateur (voir `03-droits-et-sources.md`).
+
 ## 3. Assembler la vidéo
 Mettre les segments dans l'ordre du script (`videos/<n>/script.md`) dans le logiciel de montage
 (CapCut, DaVinci Resolve gratuit) pour ajouter générique, plans de Sunny face caméra, textes et
