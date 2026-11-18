@@ -25,6 +25,8 @@ VOIX = {
     "voix1": {"reference": ICI / "references" / "voix1.wav", "exaggeration": 0.75, "cfg_weight": 0.35, "temperature": 0.8},
     "voix2": {"reference": ICI / "references" / "voix2.wav", "exaggeration": 0.8, "cfg_weight": 0.3, "temperature": 0.85},
     "defaut": {"reference": None, "exaggeration": 0.75, "cfg_weight": 0.35, "temperature": 0.8},
+    # voix intégrée de Chatterbox (enregistrement humain), version très expressive
+    "defaut_fun": {"reference": None, "exaggeration": 0.95, "cfg_weight": 0.3, "temperature": 0.85},
 }
 
 
