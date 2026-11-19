@@ -14,6 +14,11 @@ PRONONCIATION = {
     r"\bBreaking news\b": "Brèking niouze",
     r"\bRockstar\b": "Rockstar",
     r"\bReal Dimez\b": "Rile Daïmz",
+    r"\bLeonida Keys\b": "Léonida Kiz",
+    r"\bKeys\b": "Kiz",
+    r"\bjet-ski\b": "djète-ski",
+    r"\bstreamer\b": "strimeur",
+    r"\bYouTube\b": "Youtioube",
 }
 
 

@@ -128,8 +128,11 @@ def main():
         if clip is not None and plan and t >= plan[0][0]:
             ti, c0, c1, vit = [p for p in plan if p[0] <= t][-1]
             L = max(0.04, c1 - c0)
-            u = ((t - ti) * vit) % (2 * L)                      # aller-retour : pas de saut d'image
-            pos = c0 + (u if u < L else 2 * L - u)
+            if vit < 0:                                         # vitesse négative : lecture avant puis arrêt sur image
+                pos = min(c1, c0 + (t - ti) * -vit)
+            else:
+                u = ((t - ti) * vit) % (2 * L)                  # aller-retour : pas de saut d'image
+                pos = c0 + (u if u < L else 2 * L - u)
             return trame(int(pos * FPS))
         if clip is None:
             z = 1 + 0.04 * t / max(duree, 1)
