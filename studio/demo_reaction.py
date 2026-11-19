@@ -61,6 +61,7 @@ def main():
     ap.add_argument("--sortie", required=True); ap.add_argument("--postures", required=True)
     ap.add_argument("--surprise", type=float, required=True); ap.add_argument("--tele", required=True)
     ap.add_argument("--decor", default="studio/assets/studio.png")
+    ap.add_argument("--bas", type=int, default=1170, help="ligne où Sunny est coupée (sous le haut du short, avant les doigts)")
     ap.add_argument("--titre", default="N°1 — Un alligator dans la piscine ?!")
     a = ap.parse_args()
 
@@ -83,8 +84,8 @@ def main():
     decor = Image.open(a.decor).convert("RGB")
     tele = Image.open(a.tele).convert("RGB")
     f = ImageFont.truetype(FONT, 46); grand = ImageFont.truetype(FONT, 150)
-    hS = 1000; wS = int(896 * hS / 1344)                       # Sunny dans le studio
-    X_SUNNY = TV[0] + 22 - wS                                  # le bord droit de son image touche la télé
+    hS = 820; wS = int(896 * hS / a.bas)                       # Sunny dans le studio (coupée sous le short)
+    X_SUNNY = 140
     cadre_tv = decor.crop((TV[0] - 28, TV[1] - 28, TV[0] + TV[2] + 28, TV[1] + TV[3] + 28))
     masque_tv = Image.new("L", cadre_tv.size, 0)
     ImageDraw.Draw(masque_tv).rounded_rectangle((0, 0, cadre_tv.width - 1, cadre_tv.height - 1), 22, fill=255)
@@ -113,19 +114,15 @@ def main():
         # Sunny : respiration + balancement
         resp = 1 + 0.006 * math.sin(2 * math.pi * t / 3.2)
         dx = 6 * math.sin(2 * math.pi * t / 4.5)
-        s_img = Image.fromarray(sunny.clip(0, 255).astype(np.uint8)).resize((wS, int(hS * resp)))
-        s_m = Image.fromarray((msk * 255).astype(np.uint8)).resize((wS, int(hS * resp)))
+        s_img = Image.fromarray(sunny[:a.bas].clip(0, 255).astype(np.uint8)).resize((wS, int(hS * resp)))
+        s_m = Image.fromarray((msk[:a.bas] * 255).astype(np.uint8)).resize((wS, int(hS * resp)))
         sursaut = 0
         if t >= a.surprise:                                    # petit saut au moment de la surprise
             u = t - a.surprise
             sursaut = -int(28 * math.exp(-6 * u) * abs(math.sin(14 * u)))
-        cadre.paste(s_img, (int(X_SUNNY + dx), 110 + sursaut + (hS - s_img.height)), s_m)
-        # la télé passe devant (le bras tendu « entre » derrière l'écran), puis le bureau devant Sunny
-        cadre.paste(cadre_tv, (TV[0] - 28, TV[1] - 28), masque_tv); cadre.paste(tv, TV[:2])
-        d = ImageDraw.Draw(cadre)
-        d.polygon([(110, 770), (760, 770), (800, 1000), (70, 1000)], fill=(30, 10, 55))
-        d.line([(110, 770), (760, 770)], fill=(255, 62, 154), width=8)
-        d.text((435, 880), "LEONIDA LIVE", font=ImageFont.truetype(FONT, 52), fill=(33, 212, 224), anchor="mm")
+        # bas de l'image (short) posé sur le bandeau titre ; la respiration étire vers le haut
+        cadre.paste(s_img, (int(X_SUNNY + dx), H - 110 - s_img.height + sursaut), s_m)
+        cadre.paste(tv, TV[:2])
         # bandeau titre
         d = ImageDraw.Draw(cadre)
         d.rectangle((0, H - 110, W, H - 20), fill=(42, 15, 74)); d.rectangle((0, H - 110, 16, H - 20), fill=(255, 62, 154))
@@ -135,7 +132,8 @@ def main():
             u = t - a.surprise
             zoom = 1 + 0.35 * (1 - math.exp(-9 * u))
             sx = 14 * math.exp(-5 * u) * math.sin(55 * u); sy = 10 * math.exp(-5 * u) * math.cos(47 * u)
-            cx, cy = X_SUNNY + 340 + sx, 400 + sy             # vers le visage de Sunny
+            cx = X_SUNNY + 450 * wS / 896 + sx                # vers le visage de Sunny
+            cy = H - 110 - hS + 230 * hS / a.bas + 120 + sy
             cw, ch = W / zoom, H / zoom
             x0 = min(max(0, cx - cw / 2), W - cw); y0 = min(max(0, cy - ch / 2), H - ch)
             cadre = cadre.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
