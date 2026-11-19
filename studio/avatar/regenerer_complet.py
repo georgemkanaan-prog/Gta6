@@ -24,14 +24,17 @@ NEGATIF = ("bikini bottom, panties, underwear, extra fingers, missing fingers, f
            "arms, bad anatomy, seams, visible cut, nude, nsfw, nipples, cartoon, anime, blurry, text, watermark")
 
 
-def esquisse_short(img: Image.Image) -> Image.Image:
-    """Short beige en aplat (taille basse, haut des cuisses) dessiné sur le bas de maillot."""
-    d = ImageDraw.Draw(img)
-    beige, couture = (214, 196, 170), (190, 170, 142)
-    d.polygon([(268, 985), (648, 985), (700, 1344), (474, 1344), (458, 1215), (444, 1344), (225, 1344)], fill=beige)
-    d.line([(268, 1000), (648, 1000)], fill=couture, width=6)          # ceinture
-    d.line([(458, 1000), (458, 1200)], fill=couture, width=4)          # braguette
-    return img.filter(ImageFilter.GaussianBlur(1))
+def esquisse_short(img: Image.Image, ref_short: str) -> Image.Image:
+    """Le short de l'image de référence (taille -> bas) est posé sur le bas du corps, avec un fondu doux.
+    Ce n'est qu'un guide : l'image entière est ensuite repeinte d'un seul passage."""
+    ref = Image.open(ref_short).convert("RGB")
+    haut = ref.crop((190, 1100, 700, 1344))                  # à partir de la ceinture, échelle 1:1 (même largeur de hanches)
+    bas = ref.crop((190, 1244, 700, 1344))                   # jambes du short prolongées jusqu'au bas du cadre
+    morceau = Image.new("RGB", (510, 344)); morceau.paste(haut, (0, 0)); morceau.paste(bas, (0, 244))
+    m = Image.new("L", morceau.size, 0)
+    ImageDraw.Draw(m).polygon([(60, 0), (450, 0), (500, 344), (10, 344)], fill=255)
+    img.paste(morceau, (205, 1000), m.filter(ImageFilter.GaussianBlur(5)))
+    return img
 
 
 def main():
@@ -39,9 +42,10 @@ def main():
     ap.add_argument("--entree", required=True); ap.add_argument("--sortie", required=True)
     ap.add_argument("--graine", type=int, default=1); ap.add_argument("--force", type=float, default=0.55)
     ap.add_argument("--guide-seulement", action="store_true")
+    ap.add_argument("--ref-short", default=str(__import__("pathlib").Path(__file__).parent / "reference_short.png"))
     a = ap.parse_args()
 
-    guide = esquisse_short(Image.open(a.entree).convert("RGB"))
+    guide = esquisse_short(Image.open(a.entree).convert("RGB"), a.ref_short)
     if a.guide_seulement:
         guide.save(a.sortie); print(a.sortie); return
     p = StableDiffusionXLImg2ImgPipeline.from_pretrained(MODELE, torch_dtype=torch.bfloat16, variant="fp16")
