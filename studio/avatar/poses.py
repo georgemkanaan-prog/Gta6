@@ -10,6 +10,8 @@
 import argparse
 
 import numpy as np
+
+import numpy as np
 import torch
 from diffusers import DPMSolverMultistepScheduler, StableDiffusionXLInpaintPipeline
 from PIL import Image, ImageDraw, ImageFilter
@@ -67,9 +69,32 @@ def masque_bras(img: Image.Image) -> Image.Image:
     return m.filter(ImageFilter.GaussianBlur(16))
 
 
+CORPS = ("3d video game character, unreal engine 5 render, beautiful young woman standing, white deep v-neck "
+         "halter bikini top with wide straps, large round full bust, cleavage, bare toned belly, navel, beige denim "
+         "shorts, both arms relaxed straight down along her sides, hands resting against her thighs, "
+         "smooth tanned skin")
+
+
+def preparer_corps(img: Image.Image, y_cou: int, mains):
+    """Corps sous le cou à redessiner ; les mains posées devant le corps sont d'abord effacées de l'image
+    de départ (remplissage OpenCV), pour que le modèle ne les redessine pas au même endroit."""
+    import cv2
+    a = np.array(img)
+    if mains:
+        trou = Image.new("L", img.size, 0)
+        ImageDraw.Draw(trou).ellipse(mains, fill=255)
+        a = cv2.inpaint(a, np.array(trou), 15, cv2.INPAINT_TELEA)
+    m = Image.new("L", img.size, 0)
+    ImageDraw.Draw(m).rectangle((0, y_cou, img.width, img.height), fill=255)
+    return Image.fromarray(a), m.filter(ImageFilter.GaussianBlur(20))
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["base", "geste"])
+    ap.add_argument("mode", choices=["base", "geste", "corps"])
+    ap.add_argument("--y-cou", type=int, default=420, help="corps : redessiné sous cette ligne")
+    ap.add_argument("--mains", help="corps : ellipse x0,y0,x1,y1 des mains à effacer avant de redessiner")
+    ap.add_argument("--force", type=float, default=0.88)
     ap.add_argument("--entree", required=True)
     ap.add_argument("--sortie", required=True)
     ap.add_argument("--geste", choices=GESTES, default="repos")
@@ -77,6 +102,15 @@ def main():
     ap.add_argument("--etapes", type=int, default=7)
     a = ap.parse_args()
 
+    if a.mode == "corps":
+        img0 = Image.open(a.entree).convert("RGB")
+        img, m = preparer_corps(img0, a.y_cou, tuple(map(int, a.mains.split(","))) if a.mains else None)
+        out = pipeline()(prompt=CORPS, prompt_2=f"{CORPS}, {STYLE}", negative_prompt=NEGATIF, image=img, mask_image=m,
+                         strength=a.force, num_inference_steps=round(a.etapes / a.force), guidance_scale=2.0,
+                         width=W, height=H, generator=torch.Generator().manual_seed(a.graine)).images[0]
+        Image.composite(out, img0, m).save(a.sortie)
+        print(a.sortie)
+        return
     if a.mode == "base":
         img, m = preparer_base(Image.open(a.entree).convert("RGB"))
         force = 0.99
