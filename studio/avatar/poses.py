@@ -19,8 +19,8 @@ W, H = 896, 1344          # toile plan taille
 ECHELLE = 0.62            # portrait d'origine réduit : le cadre descend jusqu'au bas du ventre
 
 PERSO = ("3d video game character, unreal engine 5 render, waist-up shot of a beautiful young woman, "
-         "long straight platinum blonde hair, white deep v-neck halter top with wide straps, "
-         "round large full bust, slim waist, denim shorts at the bottom of the frame")
+         "long straight platinum blonde hair, white deep v-neck halter bikini top with wide straps, "
+         "round large full bust, bare toned belly, navel, slim waist, low-rise denim shorts at the bottom of the frame")
 STYLE = ("AAA open world game cutscene, semi-realistic, detailed skin, natural hands with five fingers, "
          "sunny street background with pink buildings and green trees, cinematic, sharp focus")
 NEGATIF = ("deformed hands, extra fingers, missing fingers, fused fingers, extra arms, extra limbs, bad anatomy, "
