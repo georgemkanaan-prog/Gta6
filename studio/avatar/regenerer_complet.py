@@ -10,7 +10,7 @@ import argparse
 
 import numpy as np
 import torch
-from diffusers import DPMSolverMultistepScheduler, StableDiffusionXLImg2ImgPipeline
+from diffusers import DPMSolverMultistepScheduler, StableDiffusionXLImg2ImgPipeline, StableDiffusionXLInpaintPipeline
 from PIL import Image, ImageDraw, ImageFilter
 
 MODELE = "Lykon/dreamshaper-xl-lightning"
@@ -42,12 +42,25 @@ def main():
     ap.add_argument("--entree", required=True); ap.add_argument("--sortie", required=True)
     ap.add_argument("--graine", type=int, default=1); ap.add_argument("--force", type=float, default=0.55)
     ap.add_argument("--guide-seulement", action="store_true")
+    ap.add_argument("--visage", help="x0,y0,x1,y1 : ovale du visage conservé tel quel")
     ap.add_argument("--ref-short", default=str(__import__("pathlib").Path(__file__).parent / "reference_short.png"))
     a = ap.parse_args()
 
     guide = esquisse_short(Image.open(a.entree).convert("RGB"), a.ref_short)
     if a.guide_seulement:
         guide.save(a.sortie); print(a.sortie); return
+    if a.visage:   # tout est repeint sauf l'ovale du visage (identité de Sunny), avec un fondu large
+        m = Image.new("L", guide.size, 255)
+        ImageDraw.Draw(m).ellipse(tuple(map(int, a.visage.split(","))), fill=0)
+        m = m.filter(ImageFilter.GaussianBlur(18))
+        p = StableDiffusionXLInpaintPipeline.from_pretrained(MODELE, torch_dtype=torch.bfloat16, variant="fp16")
+        p.scheduler = DPMSolverMultistepScheduler.from_config(p.scheduler.config, use_karras_sigmas=True,
+                                                              algorithm_type="sde-dpmsolver++")
+        p.set_progress_bar_config(disable=True)
+        out = p(prompt=PROMPT, prompt_2=PROMPT_2, negative_prompt=NEGATIF, image=guide, mask_image=m, strength=a.force,
+                num_inference_steps=round(8 / a.force), guidance_scale=2.0, width=guide.width, height=guide.height,
+                generator=torch.Generator().manual_seed(a.graine)).images[0]
+        Image.composite(out, guide, m).save(a.sortie); print(a.sortie); return
     p = StableDiffusionXLImg2ImgPipeline.from_pretrained(MODELE, torch_dtype=torch.bfloat16, variant="fp16")
     p.scheduler = DPMSolverMultistepScheduler.from_config(p.scheduler.config, use_karras_sigmas=True,
                                                           algorithm_type="sde-dpmsolver++")
