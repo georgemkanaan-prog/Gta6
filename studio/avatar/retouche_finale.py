@@ -76,7 +76,8 @@ def detail(a):
         p.scheduler.config, use_karras_sigmas=True, algorithm_type="sde-dpmsolver++")
     p.set_progress_bar_config(disable=True)
     f = a.force_zone or 0.65
-    out = p(prompt=MAINS_DETAIL, prompt_2=MAINS_DETAIL, negative_prompt=MAINS_NEGATIF, image=grand, mask_image=m,
+    pr = f"{a.precision}, {MAINS_DETAIL}" if a.precision else MAINS_DETAIL
+    out = p(prompt=pr, prompt_2=pr, negative_prompt=MAINS_NEGATIF, image=grand, mask_image=m,
             strength=f, num_inference_steps=round(8 / f), guidance_scale=2.0, width=W, height=H,
             generator=torch.Generator().manual_seed(a.graine)).images[0]
     out = Image.composite(out, grand, m).resize(crop.size, Image.LANCZOS)
@@ -111,6 +112,7 @@ if __name__ == "__main__":
     ap.add_argument("--entree", required=True); ap.add_argument("--sortie", required=True)
     ap.add_argument("--ellipse"); ap.add_argument("--quoi", choices=QUOI)
     ap.add_argument("--boite", help="detail : zone x0,y0,x1,y1 découpée et agrandie")
+    ap.add_argument("--precision", help="detail : consigne ajoutée en tête (ex. « short natural thumb »)")
     ap.add_argument("--graine", type=int, default=1)
     ap.add_argument("--force-zone", type=float)
     ap.add_argument("--depuis-y", type=int, default=430)
