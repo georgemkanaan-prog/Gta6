@@ -93,15 +93,6 @@ def main():
 
     decor = Image.open(a.decor).convert("RGB")
     tele = Image.open(a.tele).convert("RGB") if a.tele else None
-    clip = None
-    if a.clip:
-        brut = lire_video(a.clip)
-        z = a.zoom_clip; ch, cw = brut.shape[1:3]
-        y0, x0 = int(ch * (1 - z) / 2), int(cw * (1 - z) / 2)
-        clip = [Image.fromarray(fr[y0:ch - y0, x0:cw - x0]).resize((TV[2], TV[3]), Image.BICUBIC) for fr in brut]
-    if a.ralenti:
-        r0, r1, rt = map(float, a.ralenti.split(","))
-
     plan = []
     if a.plan_tele:
         for bloc in a.plan_tele.split(";"):
@@ -110,13 +101,36 @@ def main():
             plan.append((float(ti), c0, c1, float(vit)))
         plan.sort()
 
+    clip = None
+    if a.clip:
+        # seuls les morceaux utilisés par le plan sont décodés, recadrés et réduits par ffmpeg (peu de mémoire)
+        z = a.zoom_clip
+        filtre = f"crop=iw*{z}:ih*{z},scale={TV[2]}:{TV[3]},fps={FPS}"
+        morceaux = ([(0, 0.1)] + [(c0, c1) for _, c0, c1, _ in plan]) if plan else [(0, 1e6)]   # + 1re image (avant le plan)
+        clip = {}
+        for c0, c1 in morceaux:
+            brut = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{c0:.3f}", "-to", f"{c1 + 0.1:.3f}", "-i", a.clip,
+                                   "-vf", filtre, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                                  capture_output=True, check=True).stdout
+            fr = np.frombuffer(brut, np.uint8).reshape(-1, TV[3], TV[2], 3)
+            for k in range(len(fr)):
+                clip[int(round(c0 * FPS)) + k] = Image.fromarray(fr[k])
+    if a.ralenti:
+        r0, r1, rt = map(float, a.ralenti.split(","))
+
+    def trame(k):
+        if k in clip:
+            return clip[k]
+        cles = sorted(clip)
+        return clip[min(cles, key=lambda c: abs(c - k))]
+
     def image_tele(t):
         if clip is not None and plan and t >= plan[0][0]:
             ti, c0, c1, vit = [p for p in plan if p[0] <= t][-1]
             L = max(0.04, c1 - c0)
             u = ((t - ti) * vit) % (2 * L)                      # aller-retour : pas de saut d'image
             pos = c0 + (u if u < L else 2 * L - u)
-            return clip[min(len(clip) - 1, int(pos * FPS))]
+            return trame(int(pos * FPS))
         if clip is None:
             z = 1 + 0.04 * t / max(duree, 1)
             cw, ch = int(tele.width / z), int(tele.height / z)
@@ -125,9 +139,8 @@ def main():
         if a.ralenti and t >= rt:                              # ralenti en boucle
             n = int((r1 - r0) * FPS * 2)
             k = int((t - rt) * FPS) % max(1, n)
-            return clip[min(len(clip) - 1, int(r0 * FPS + k / 2))]
-        k = int((t - a.clip_debut) * FPS)
-        return clip[min(len(clip) - 1, max(0, k))]
+            return trame(int(r0 * FPS + k / 2))
+        return trame(max(0, int((t - a.clip_debut) * FPS)))
     f = ImageFont.truetype(FONT, 46); grand = ImageFont.truetype(FONT, 150)
     hS = 820; wS = int(896 * hS / a.bas)                       # Sunny dans le studio (coupée sous le short)
     X_SUNNY = 140
