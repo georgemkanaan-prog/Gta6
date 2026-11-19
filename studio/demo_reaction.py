@@ -59,9 +59,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--visage", required=True); ap.add_argument("--audio", required=True)
     ap.add_argument("--sortie", required=True); ap.add_argument("--postures", required=True)
-    ap.add_argument("--surprise", type=float, required=True); ap.add_argument("--tele", required=True)
+    ap.add_argument("--surprise", type=float, required=True); ap.add_argument("--tele")
     ap.add_argument("--decor", default="studio/assets/studio.png")
     ap.add_argument("--bas", type=int, default=1170, help="ligne où Sunny est coupée (sous le haut du short, avant les doigts)")
+    ap.add_argument("--clip", help="extrait vidéo affiché dans la télé (remplace --tele)")
+    ap.add_argument("--clip-debut", type=float, default=0, help="instant où l'extrait démarre (avant : 1re image)")
+    ap.add_argument("--ralenti", help="debut_clip,fin_clip,instant : revoit ce passage à mi-vitesse à partir de l'instant")
+    ap.add_argument("--zoom-clip", type=float, default=1.0, help="0.75 = recadrage au centre (clip d'un créateur)")
+    ap.add_argument("--credit", help="crédit affiché dans la télé, ex. « Clip : @pseudo »")
+    ap.add_argument("--surprise-duree", type=float, default=3.0, help="durée du zoom surprise avant retour")
+    ap.add_argument("--texte2", default="UN ALLIGATOR ?!")
     ap.add_argument("--titre", default="N°1 — Un alligator dans la piscine ?!")
     a = ap.parse_args()
 
@@ -82,7 +89,34 @@ def main():
     postures.sort(key=lambda p: p[0])
 
     decor = Image.open(a.decor).convert("RGB")
-    tele = Image.open(a.tele).convert("RGB")
+    tele = Image.open(a.tele).convert("RGB") if a.tele else None
+    clip = None
+    if a.clip:
+        brut = lire_video(a.clip)
+        z = a.zoom_clip; ch, cw = brut.shape[1:3]
+        y0, x0 = int(ch * (1 - z) / 2), int(cw * (1 - z) / 2)
+        clip = [Image.fromarray(fr[y0:ch - y0, x0:cw - x0]).resize((TV[2], TV[3]), Image.BICUBIC) for fr in brut]
+        if a.credit:
+            fc = ImageFont.truetype(FONT, 24)
+            for im in clip:
+                dc = ImageDraw.Draw(im); tw_ = dc.textlength(a.credit, font=fc)
+                dc.rectangle((TV[2] - tw_ - 36, TV[3] - 50, TV[2] - 12, TV[3] - 12), fill=(0, 0, 0))
+                dc.text((TV[2] - tw_ - 24, TV[3] - 45), a.credit, font=fc, fill=(255, 255, 255))
+    if a.ralenti:
+        r0, r1, rt = map(float, a.ralenti.split(","))
+
+    def image_tele(t):
+        if clip is None:
+            z = 1 + 0.04 * t / max(duree, 1)
+            cw, ch = int(tele.width / z), int(tele.height / z)
+            return tele.crop(((tele.width - cw) // 2, (tele.height - ch) // 2, (tele.width + cw) // 2,
+                              (tele.height + ch) // 2)).resize((TV[2], TV[3]))
+        if a.ralenti and t >= rt:                              # ralenti en boucle
+            n = int((r1 - r0) * FPS * 2)
+            k = int((t - rt) * FPS) % max(1, n)
+            return clip[min(len(clip) - 1, int(r0 * FPS + k / 2))]
+        k = int((t - a.clip_debut) * FPS)
+        return clip[min(len(clip) - 1, max(0, k))]
     f = ImageFont.truetype(FONT, 46); grand = ImageFont.truetype(FONT, 150)
     hS = 820; wS = int(896 * hS / a.bas)                       # Sunny dans le studio (coupée sous le short)
     X_SUNNY = 140
@@ -104,12 +138,7 @@ def main():
         hh, ww = min(1344 - DY, va.shape[0]), min(896 - DX, va.shape[1])
         calque[DY:DY + hh, DX:DX + ww] = va[:hh, :ww]
         sunny = img * (1 - ovale) + calque * ovale
-        # télé : image avec lent zoom
-        z = 1 + 0.04 * t / max(duree, 1)
-        tw, th = TV[2], TV[3]
-        cw, ch = int(tele.width / z), int(tele.height / z)
-        tv = tele.crop(((tele.width - cw) // 2, (tele.height - ch) // 2, (tele.width + cw) // 2,
-                        (tele.height + ch) // 2)).resize((tw, th))
+        tv = image_tele(t)
         cadre = decor.copy()
         # Sunny : respiration + balancement
         resp = 1 + 0.006 * math.sin(2 * math.pi * t / 3.2)
@@ -117,7 +146,8 @@ def main():
         s_img = Image.fromarray(sunny[:a.bas].clip(0, 255).astype(np.uint8)).resize((wS, int(hS * resp)))
         s_m = Image.fromarray((msk[:a.bas] * 255).astype(np.uint8)).resize((wS, int(hS * resp)))
         sursaut = 0
-        if t >= a.surprise:                                    # petit saut au moment de la surprise
+        en_surprise = a.surprise <= t < a.surprise + a.surprise_duree + 0.6
+        if en_surprise:                                        # petit saut au moment de la surprise
             u = t - a.surprise
             sursaut = -int(28 * math.exp(-6 * u) * abs(math.sin(14 * u)))
         # bas de l'image (short) posé sur le bandeau titre ; la respiration étire vers le haut
@@ -128,16 +158,18 @@ def main():
         d.rectangle((0, H - 110, W, H - 20), fill=(42, 15, 74)); d.rectangle((0, H - 110, 16, H - 20), fill=(255, 62, 154))
         d.text((50, H - 88), a.titre, font=f, fill=(255, 255, 255))
         # surprise : zoom rapide sur Sunny + secousse + « QUOI ?! »
-        if t >= a.surprise:
+        if en_surprise:
             u = t - a.surprise
             zoom = 1 + 0.35 * (1 - math.exp(-9 * u))
+            if u > a.surprise_duree:                           # retour doux au plan large
+                zoom = 1 + 0.35 * max(0.0, 1 - (u - a.surprise_duree) / 0.6)
             sx = 14 * math.exp(-5 * u) * math.sin(55 * u); sy = 10 * math.exp(-5 * u) * math.cos(47 * u)
             cx = X_SUNNY + 450 * wS / 896 + sx                # vers le visage de Sunny
             cy = H - 110 - hS + 230 * hS / a.bas + 120 + sy
             cw, ch = W / zoom, H / zoom
             x0 = min(max(0, cx - cw / 2), W - cw); y0 = min(max(0, cy - ch / 2), H - ch)
             cadre = cadre.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
-            if u > 0.12:
+            if 0.12 < u < a.surprise_duree:
                 d = ImageDraw.Draw(cadre)
                 ech = min(1.0, (u - 0.12) * 6)
                 fq = ImageFont.truetype(FONT, int(170 * (0.6 + 0.4 * ech)))
@@ -145,7 +177,7 @@ def main():
                 x, y = 1060, 170
                 d.text((x, y), txt, font=fq, fill=(255, 220, 0), stroke_width=12, stroke_fill=(42, 15, 74))
                 if u > 0.5:
-                    d.text((1010, 400), "UN ALLIGATOR ?!", font=ImageFont.truetype(FONT, 80), fill=(33, 212, 224),
+                    d.text((1010, 400), a.texte2, font=ImageFont.truetype(FONT, 80), fill=(33, 212, 224),
                            stroke_width=8, stroke_fill=(42, 15, 74))
         ff.stdin.write(np.asarray(cadre, np.uint8).tobytes())
     ff.stdin.close(); ff.wait()
