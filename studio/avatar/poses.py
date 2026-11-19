@@ -89,9 +89,30 @@ def preparer_corps(img: Image.Image, y_cou: int, mains):
     return Image.fromarray(a), m.filter(ImageFilter.GaussianBlur(20))
 
 
+BRAS = ("3d video game character, unreal engine 5 render, beautiful young woman, white deep v-neck halter bikini top, "
+        "large round full bust, cleavage, bare toned belly, both forearms hanging straight down along her sides, "
+        "relaxed hands beside her thighs, slender feminine fingers, smooth tanned skin")
+
+
+def masque_zones(taille, zones, ellipses):
+    """zones : segments « x1,y1,x2,y2,largeur » séparés par « ; » ; ellipses : « x0,y0,x1,y1 » séparées par « ; »."""
+    m = Image.new("L", taille, 0)
+    d = ImageDraw.Draw(m)
+    for z in filter(None, (zones or "").split(";")):
+        x1, y1, x2, y2, w = map(int, z.split(","))
+        d.line([(x1, y1), (x2, y2)], fill=255, width=w)
+        for x, y in ((x1, y1), (x2, y2)):
+            d.ellipse((x - w // 2, y - w // 2, x + w // 2, y + w // 2), fill=255)
+    for e in filter(None, (ellipses or "").split(";")):
+        d.ellipse(tuple(map(int, e.split(","))), fill=255)
+    return m
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["base", "geste", "corps"])
+    ap.add_argument("mode", choices=["base", "geste", "corps", "bras"])
+    ap.add_argument("--zones", help="bras : segments à redessiner (anciens avant-bras + nouvelle position)")
+    ap.add_argument("--ellipses", help="bras : ellipses à redessiner (ex. mains posées sur la poitrine)")
     ap.add_argument("--y-cou", type=int, default=420, help="corps : redessiné sous cette ligne")
     ap.add_argument("--mains", help="corps : ellipse x0,y0,x1,y1 des mains à effacer avant de redessiner")
     ap.add_argument("--force", type=float, default=0.88)
@@ -102,6 +123,18 @@ def main():
     ap.add_argument("--etapes", type=int, default=7)
     a = ap.parse_args()
 
+    if a.mode == "bras":   # seuls les avant-bras et les mains bougent ; le reste du corps est conservé
+        import cv2
+        img0 = Image.open(a.entree).convert("RGB")
+        dur = masque_zones(img0.size, a.zones, a.ellipses)
+        init = Image.fromarray(cv2.inpaint(np.array(img0), np.array(dur), 15, cv2.INPAINT_TELEA))
+        m = dur.filter(ImageFilter.GaussianBlur(10))
+        out = pipeline()(prompt=BRAS, prompt_2=f"{BRAS}, {STYLE}", negative_prompt=NEGATIF + ", hands on chest",
+                         image=init, mask_image=m, strength=a.force, num_inference_steps=round(a.etapes / a.force),
+                         guidance_scale=2.0, width=W, height=H, generator=torch.Generator().manual_seed(a.graine)).images[0]
+        Image.composite(out, img0, m).save(a.sortie)
+        print(a.sortie)
+        return
     if a.mode == "corps":
         img0 = Image.open(a.entree).convert("RGB")
         img, m = preparer_corps(img0, a.y_cou, tuple(map(int, a.mains.split(","))) if a.mains else None)
