@@ -15,9 +15,10 @@ STYLE = "3d video game character, unreal engine 5 render, semi-realistic, detail
 QUOI = {
     "epaule": ("bare smooth shoulder skin, a single wide white halter strap", 0.85,
                "extra strap, thin strap, string, double strap"),
-    "mains": ("her two hands gently resting on her chest, natural elegant hands, exactly five fingers on each hand, "
-              "short natural nails", 0.75,
-              "extra fingers, missing fingers, fused fingers, six fingers, deformed hands, long claws"),
+    "mains": ("one young smooth hand resting flat on her chest below the collarbone, the other arm relaxed down at her "
+              "side, natural elegant hand, exactly five fingers, short natural nails", 0.9,
+              "extra fingers, missing fingers, fused fingers, six fingers, deformed hands, long claws, interlaced fingers, "
+              "two hands on chest, wrinkled old hands"),
 }
 NEGATIF = "deformed, bad anatomy, blurry, low quality, nude, nsfw, cartoon, text, watermark"
 
