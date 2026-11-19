@@ -15,10 +15,11 @@ STYLE = "3d video game character, unreal engine 5 render, semi-realistic, detail
 QUOI = {
     "epaule": ("bare smooth shoulder skin, a single wide white halter strap", 0.85,
                "extra strap, thin strap, string, double strap"),
-    "mains": ("one young smooth hand resting flat on her chest below the collarbone, the other arm relaxed down at her "
-              "side, natural elegant hand, exactly five fingers, short natural nails", 0.9,
-              "extra fingers, missing fingers, fused fingers, six fingers, deformed hands, long claws, interlaced fingers, "
-              "two hands on chest, wrinkled old hands"),
+    # retouche légère des mains existantes (la pose et le haut de maillot sont conservés)
+    "mains": ("two young smooth hands resting on her chest over the white bikini top, fingers together, "
+              "exactly five fingers on each hand, short natural nails", 0.55,
+              "extra fingers, missing fingers, fused fingers, six fingers, deformed hands, long claws, "
+              "wrinkled old hands, topless, bare breasts, nipples, missing top"),
 }
 NEGATIF = "deformed, bad anatomy, blurry, low quality, nude, nsfw, cartoon, text, watermark"
 
@@ -35,6 +36,8 @@ def zone(a):
     img = Image.open(a.entree).convert("RGB")
     m = masque_ellipse(img.size, tuple(map(int, a.ellipse.split(","))))
     prompt, force, neg = QUOI[a.quoi]
+    if a.force_zone:
+        force = a.force_zone
     p = StableDiffusionXLInpaintPipeline.from_pretrained(MODELE, torch_dtype=torch.bfloat16, variant="fp16")
     p.scheduler = DPMSolverMultistepScheduler.from_config(
         p.scheduler.config, use_karras_sigmas=True, algorithm_type="sde-dpmsolver++")
@@ -70,7 +73,8 @@ if __name__ == "__main__":
     ap.add_argument("--entree", required=True); ap.add_argument("--sortie", required=True)
     ap.add_argument("--ellipse"); ap.add_argument("--quoi", choices=QUOI)
     ap.add_argument("--graine", type=int, default=1)
+    ap.add_argument("--force-zone", type=float)
     ap.add_argument("--depuis-y", type=int, default=430)
-    ap.add_argument("--force", type=float, default=0.85)
+    ap.add_argument("--force", type=float, default=0.85, help="peau : intensité ; zone : remplace la force par défaut")
     a = ap.parse_args()
     zone(a) if a.mode == "zone" else peau(a)
