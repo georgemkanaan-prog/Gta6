@@ -64,6 +64,8 @@ def main():
     ap.add_argument("--bas", type=int, default=1170, help="ligne où Sunny est coupée (sous le haut du short, avant les doigts)")
     ap.add_argument("--clip", help="extrait vidéo affiché dans la télé (remplace --tele)")
     ap.add_argument("--clip-debut", type=float, default=0, help="instant où l'extrait démarre (avant : 1re image)")
+    ap.add_argument("--plan-tele", help="« instant:debut-fin:vitesse;… » : à partir de l'instant, la télé passe ce morceau "
+                    "du clip en boucle aller-retour à cette vitesse")
     ap.add_argument("--ralenti", help="debut_clip,fin_clip,instant : revoit ce passage à mi-vitesse à partir de l'instant")
     ap.add_argument("--zoom-clip", type=float, default=1.0, help="0.75 = recadrage au centre (clip d'un créateur)")
     ap.add_argument("--credit", help="crédit affiché dans la télé, ex. « Clip : @pseudo »")
@@ -105,7 +107,21 @@ def main():
     if a.ralenti:
         r0, r1, rt = map(float, a.ralenti.split(","))
 
+    plan = []
+    if a.plan_tele:
+        for bloc in a.plan_tele.split(";"):
+            ti, morceau, vit = bloc.split(":")
+            c0, c1 = map(float, morceau.split("-"))
+            plan.append((float(ti), c0, c1, float(vit)))
+        plan.sort()
+
     def image_tele(t):
+        if clip is not None and plan and t >= plan[0][0]:
+            ti, c0, c1, vit = [p for p in plan if p[0] <= t][-1]
+            L = max(0.04, c1 - c0)
+            u = ((t - ti) * vit) % (2 * L)                      # aller-retour : pas de saut d'image
+            pos = c0 + (u if u < L else 2 * L - u)
+            return clip[min(len(clip) - 1, int(pos * FPS))]
         if clip is None:
             z = 1 + 0.04 * t / max(duree, 1)
             cw, ch = int(tele.width / z), int(tele.height / z)
