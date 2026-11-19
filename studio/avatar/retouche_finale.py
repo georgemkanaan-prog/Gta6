@@ -4,6 +4,7 @@
     python retouche_finale.py zone  --entree img.png --sortie out.png --ellipse x0,y0,x1,y1 --quoi epaule --graine 1
     python retouche_finale.py zone  --entree img.png --sortie out.png --ellipse x0,y0,x1,y1 --quoi mains --graine 1
     python retouche_finale.py peau  --entree img.png --sortie out.png --depuis-y 430
+    python retouche_finale.py detail --entree img.png --sortie out.png --boite 200,550,600,880 --ellipse 30,20,380,310
 """
 import argparse
 
@@ -49,6 +50,43 @@ def zone(a):
     print(a.sortie)
 
 
+MAINS_DETAIL = ("close-up of a young woman's two hands gently placed on her chest over a white bikini top, "
+                "slender feminine fingers, exactly five fingers on each hand, long almond nails with white french "
+                "manicure, smooth tanned skin, realistic hand anatomy, 3d video game character, unreal engine 5 render")
+MAINS_NEGATIF = ("extra fingers, six fingers, missing fingers, fused fingers, merged fingers, extra hand, extra thumb, "
+                 "deformed hands, bony veiny old hands, mutated, blurry, nude, nipples, missing top, cartoon")
+
+
+def detail(a):
+    """Retouche à haute résolution : la zone est découpée, agrandie (~1 Mpx), redessinée puis recollée."""
+    import torch
+    from diffusers import DPMSolverMultistepScheduler, StableDiffusionXLInpaintPipeline
+    img = Image.open(a.entree).convert("RGB")
+    x0, y0, x1, y1 = map(int, a.boite.split(","))
+    crop = img.crop((x0, y0, x1, y1))
+    k = (1024 * 1024 / (crop.width * crop.height)) ** 0.5
+    W, H = int(crop.width * k) // 8 * 8, int(crop.height * k) // 8 * 8
+    grand = crop.resize((W, H), Image.LANCZOS)
+    m = Image.new("L", (W, H), 0)
+    ex0, ey0, ex1, ey1 = [int(v * k) for v in map(int, a.ellipse.split(","))]   # ellipse relative à la boîte
+    ImageDraw.Draw(m).ellipse((ex0, ey0, ex1, ey1), fill=255)
+    m = m.filter(ImageFilter.GaussianBlur(24))
+    p = StableDiffusionXLInpaintPipeline.from_pretrained(MODELE, torch_dtype=torch.bfloat16, variant="fp16")
+    p.scheduler = DPMSolverMultistepScheduler.from_config(
+        p.scheduler.config, use_karras_sigmas=True, algorithm_type="sde-dpmsolver++")
+    p.set_progress_bar_config(disable=True)
+    f = a.force_zone or 0.65
+    out = p(prompt=MAINS_DETAIL, prompt_2=MAINS_DETAIL, negative_prompt=MAINS_NEGATIF, image=grand, mask_image=m,
+            strength=f, num_inference_steps=round(8 / f), guidance_scale=2.0, width=W, height=H,
+            generator=torch.Generator().manual_seed(a.graine)).images[0]
+    out = Image.composite(out, grand, m).resize(crop.size, Image.LANCZOS)
+    m_petit = m.resize(crop.size, Image.LANCZOS)
+    res = img.copy()
+    res.paste(Image.composite(out, crop, m_petit), (x0, y0))
+    res.save(a.sortie)
+    print(a.sortie)
+
+
 def peau(a):
     """Lisse la peau (taches, boutons) sous le visage en gardant le grain : filtre bilatéral + fondu partiel."""
     import cv2
@@ -69,12 +107,13 @@ def peau(a):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["zone", "peau"])
+    ap.add_argument("mode", choices=["zone", "peau", "detail"])
     ap.add_argument("--entree", required=True); ap.add_argument("--sortie", required=True)
     ap.add_argument("--ellipse"); ap.add_argument("--quoi", choices=QUOI)
+    ap.add_argument("--boite", help="detail : zone x0,y0,x1,y1 découpée et agrandie")
     ap.add_argument("--graine", type=int, default=1)
     ap.add_argument("--force-zone", type=float)
     ap.add_argument("--depuis-y", type=int, default=430)
     ap.add_argument("--force", type=float, default=0.85, help="peau : intensité ; zone : remplace la force par défaut")
     a = ap.parse_args()
-    zone(a) if a.mode == "zone" else peau(a)
+    {"zone": zone, "peau": peau, "detail": detail}[a.mode](a)
