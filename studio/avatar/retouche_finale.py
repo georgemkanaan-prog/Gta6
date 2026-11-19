@@ -79,7 +79,8 @@ def detail(a):
     pr = f"{a.precision}, {MAINS_DETAIL}" if a.precision else MAINS_DETAIL
     neg = MAINS_NEGATIF
     if a.libre:   # consigne complète à la place de la description des mains (ex. effacer un bout de doigt)
-        pr, neg = a.libre, "finger, thumb, fingernail, nail, hand, deformed, blurry, " + NEGATIF
+        pr = a.libre
+        neg = a.negatif or ("finger, thumb, fingernail, nail, hand, deformed, blurry, " + NEGATIF)
     out = p(prompt=pr, prompt_2=pr, negative_prompt=neg, image=grand, mask_image=m,
             strength=f, num_inference_steps=round(8 / f), guidance_scale=2.0, width=W, height=H,
             generator=torch.Generator().manual_seed(a.graine)).images[0]
@@ -116,6 +117,7 @@ if __name__ == "__main__":
     ap.add_argument("--ellipse"); ap.add_argument("--quoi", choices=QUOI)
     ap.add_argument("--boite", help="detail : zone x0,y0,x1,y1 découpée et agrandie")
     ap.add_argument("--precision", help="detail : consigne ajoutée en tête (ex. « short natural thumb »)")
+    ap.add_argument("--negatif", help="detail --libre : négatif à utiliser (sinon : effacement de doigts)")
     ap.add_argument("--libre", help="detail : consigne complète (remplace la description des mains)")
     ap.add_argument("--graine", type=int, default=1)
     ap.add_argument("--force-zone", type=float)
