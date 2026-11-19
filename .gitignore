@@ -12,3 +12,5 @@ __pycache__/
 !videos/demo/*.mp4
 !videos/demo/*.wav
 !videos/002-jour-de-sortie/extraits/*.mp4
+!videos/002-jour-de-sortie/*.mp4
+!videos/002-jour-de-sortie/*.wav
