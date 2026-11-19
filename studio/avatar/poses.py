@@ -16,17 +16,17 @@ from PIL import Image, ImageDraw, ImageFilter
 
 MODELE = "Lykon/dreamshaper-xl-lightning"
 W, H = 896, 1344          # toile plan taille
-ECHELLE = 0.62            # portrait d'origine réduit : le cadre descend jusqu'au bas du ventre
+ECHELLE = 0.85            # portrait d'origine réduit : le bas du cadre tombe au bas du ventre
 
 PERSO = ("3d video game character, unreal engine 5 render, waist-up shot of a beautiful young woman, "
          "long straight platinum blonde hair, white deep v-neck halter bikini top with wide straps, "
-         "round large full bust, bare toned belly, navel, slim waist, low-rise denim shorts at the bottom of the frame")
+         "large round full bust, cleavage, bare belly, navel, cropped at the lower belly, arms relaxed at her sides")
 STYLE = ("AAA open world game cutscene, semi-realistic, detailed skin, natural hands with five fingers, "
          "sunny street background with pink buildings and green trees, cinematic, sharp focus")
 NEGATIF = ("deformed hands, extra fingers, missing fingers, fused fingers, extra arms, extra limbs, bad anatomy, "
            "cropped head, nude, nsfw, nipples, cartoon, anime, blurry, low quality, text, logo, watermark")
 GESTES = {
-    "repos": "hands clasped together in front of her waist",
+    "repos": "arms relaxed down at her sides, hands out of frame",
     "ouvertes": "both hands raised at chest height with open palms, expressive shrug",
     "pointe": "right arm extended to the side, index finger pointing to the side",
     "pouce": "one hand giving a thumbs up at chest height",
