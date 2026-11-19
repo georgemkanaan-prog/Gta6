@@ -99,3 +99,45 @@ if __name__ == "__main__":
     out = Path(sys.argv[1])
     cartes(out, Path(sys.argv[2]) if len(sys.argv) > 2 else None)
     print("cartes :", sorted(p.name for p in out.glob("*.png")))
+
+
+def cartes_sup(sortie: Path, illustration: Path | None, image_flamant: Path | None):
+    ill = Image.open(illustration).convert("RGB").resize((W, H)) if illustration and illustration.exists() else fond(False)
+    # personnages
+    im = fond(); d = ImageDraw.Draw(im); bandeau(d, "LE SAVIEZ-VOUS ? — LES HÉROS", TURQ)
+    centre(d, 230, "LUCIA & JASON", 96, JAUNE, 6); centre(d, 320, "le duo « Bonnie & Clyde » de Leonida", 38)
+    for i, n in enumerate(["Cal", "Boobie Ike", "Dre'Quan", "Real Dimez", "Raul Bautista", "Brian Heder"]):
+        x, y = 70 + (i % 3) * 390, 420 + (i // 3) * 120
+        d.rounded_rectangle((x, y, x + 360, y + 95), 18, fill=NUIT, outline=ROSE, width=3)
+        d.text((x + 180, y + 48), n, font=f(38), fill=(255, 255, 255), anchor="mm")
+    im.save(sortie / "personnages.png")
+    # musique
+    im = fond(); d = ImageDraw.Draw(im); bandeau(d, "LE SAVIEZ-VOUS ? — LA MUSIQUE", TURQ)
+    for i, (t1, t2) in enumerate([("TRAILER 1", "Tom Petty — Love Is a Long Road"), ("TRAILER 2", "The Pointer Sisters — Hot Together")]):
+        y = 230 + i * 210
+        d.rounded_rectangle((90, y, W - 90, y + 170), 24, fill=NUIT, outline=ROSE, width=4)
+        d.text((130, y + 50), "♪ " + t1, font=f(40), fill=JAUNE, anchor="lm")
+        d.text((130, y + 115), t2, font=f(44), fill=(255, 255, 255), anchor="lm")
+    im.save(sortie / "musique.png")
+    # avis de recherche : le flamant
+    im = fond(); d = ImageDraw.Draw(im); bandeau(d, "FLASH SPÉCIAL — AVIS DE RECHERCHE", (220, 30, 40))
+    if image_flamant and image_flamant.exists():
+        fl = Image.open(image_flamant).convert("RGB")
+        fl = fl.crop((fl.width * 0.28, fl.height * 0.08, fl.width * 0.72, fl.height * 0.92)).resize((420, 470))
+        d.rectangle((95, 145, 535, 635), fill=(240, 225, 190)); im.paste(fl, (105, 155))
+    d.text((620, 250), "RECHERCHÉ", font=f(84), fill=JAUNE, stroke_width=6, stroke_fill=NUIT)
+    d.text((620, 370), "Flamant rose", font=f(52), fill=(255, 255, 255))
+    d.text((620, 440), "Racket et regard menaçant", font=f(36), fill=(255, 255, 255))
+    d.text((620, 530), "NE PAS LE REGARDER", font=f(40), fill=ROSE)
+    d.text((620, 585), "DANS LES YEUX", font=f(40), fill=ROSE)
+    im.save(sortie / "flash2.png")
+    # Vice City 2002 -> 2026
+    im = ill.filter(ImageFilter.GaussianBlur(3)); d = ImageDraw.Draw(im); bandeau(d, "LE SAVIEZ-VOUS ? — VICE CITY", TURQ)
+    d.rounded_rectangle((140, 260, W - 140, 560), 30, fill=NUIT)
+    centre(d, 340, "2002 : GTA Vice City", 64, (200, 200, 200)); centre(d, 470, "2026 : le grand retour", 72, JAUNE, 5)
+    d.text((W - 20, H - 20), "illustration", font=f(22), fill=(255, 255, 255), anchor="rd")
+    im.save(sortie / "vicecity.png")
+
+
+if __name__ == "__main__" and len(sys.argv) > 3:
+    cartes_sup(Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3]))
