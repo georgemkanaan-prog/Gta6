@@ -43,18 +43,19 @@ def pipeline():
     return p
 
 
-def preparer_base(portrait: Image.Image):
+def preparer_base(portrait: Image.Image, echelle=None, poitrine=True):
     """Portrait réduit en haut de la toile ; les zones vides sont pré-remplies (étirement flou des bords)."""
-    pw, ph = int(portrait.width * ECHELLE), int(portrait.height * ECHELLE)
+    e = echelle or ECHELLE
+    pw, ph = int(portrait.width * e), int(portrait.height * e)
     x0 = (W - pw) // 2
     petit = portrait.resize((pw, ph), Image.LANCZOS)
     toile = petit.resize((W, H), Image.BILINEAR).filter(ImageFilter.GaussianBlur(25))
     toile.paste(petit, (x0, 0))
     masque = Image.new("L", (W, H), 255)
-    ImageDraw.Draw(masque).rectangle((x0 + 12, 0, x0 + pw - 12, ph - 60), fill=0)
-    # poitrine : zone retravaillée (plus ronde et plus volumineuse)
-    cx, cy = W // 2, int(ph * 0.90)
-    ImageDraw.Draw(masque).ellipse((cx - 190, cy - 120, cx + 190, cy + 150), fill=255)
+    ImageDraw.Draw(masque).rectangle((x0 + 12, 0, x0 + pw - 12, ph - 30), fill=0)
+    if poitrine:   # poitrine : zone retravaillée (plus ronde et plus volumineuse)
+        cx, cy = W // 2, int(ph * 0.90)
+        ImageDraw.Draw(masque).ellipse((cx - 190, cy - 120, cx + 190, cy + 150), fill=255)
     return toile, masque.filter(ImageFilter.GaussianBlur(14))
 
 
@@ -89,6 +90,9 @@ def preparer_corps(img: Image.Image, y_cou: int, mains):
     return Image.fromarray(a), m.filter(ImageFilter.GaussianBlur(20))
 
 
+PROLONGER = ("3d video game character, unreal engine 5 render, young woman standing, white bikini top, bare toned "
+             "belly, navel, low-rise beige denim shorts, upper thighs, both arms hanging straight down along her sides, "
+             "relaxed hands beside her thighs, slender feminine fingers, five fingers")
 BRAS = ("3d video game character, unreal engine 5 render, beautiful young woman, white deep v-neck halter bikini top, "
         "large round full bust, cleavage, bare toned belly, both forearms hanging straight down along her sides, "
         "relaxed hands beside her thighs, slender feminine fingers, smooth tanned skin")
@@ -110,7 +114,8 @@ def masque_zones(taille, zones, ellipses):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["base", "geste", "corps", "bras"])
+    ap.add_argument("mode", choices=["base", "geste", "corps", "bras", "prolonger"])
+    ap.add_argument("--echelle", type=float, default=0.72, help="prolonger : taille de l'image validée dans la toile")
     ap.add_argument("--zones", help="bras : segments à redessiner (anciens avant-bras + nouvelle position)")
     ap.add_argument("--ellipses", help="bras : ellipses à redessiner (ex. mains posées sur la poitrine)")
     ap.add_argument("--y-cou", type=int, default=420, help="corps : redessiné sous cette ligne")
@@ -142,6 +147,15 @@ def main():
                          strength=a.force, num_inference_steps=round(a.etapes / a.force), guidance_scale=2.0,
                          width=W, height=H, generator=torch.Generator().manual_seed(a.graine)).images[0]
         Image.composite(out, img0, m).save(a.sortie)
+        print(a.sortie)
+        return
+    if a.mode == "prolonger":   # image validée réduite en haut ; seuls le bas et les côtés sont générés
+        img, m = preparer_base(Image.open(a.entree).convert("RGB"), a.echelle, poitrine=False)
+        m = m.filter(ImageFilter.GaussianBlur(6))
+        out = pipeline()(prompt=PROLONGER, prompt_2=f"{PROLONGER}, {STYLE}", negative_prompt=NEGATIF, image=img,
+                         mask_image=m, strength=0.99, num_inference_steps=round(a.etapes / 0.99), guidance_scale=2.0,
+                         width=W, height=H, generator=torch.Generator().manual_seed(a.graine)).images[0]
+        Image.composite(out, img, m).save(a.sortie)
         print(a.sortie)
         return
     if a.mode == "base":
