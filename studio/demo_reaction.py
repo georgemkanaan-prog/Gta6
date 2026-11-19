@@ -70,6 +70,7 @@ def main():
     ap.add_argument("--zoom-clip", type=float, default=1.0, help="0.75 = recadrage au centre (clip d'un créateur)")
     ap.add_argument("--credit", help="crédit affiché dans la télé, ex. « Clip : @pseudo »")
     ap.add_argument("--surprise-duree", type=float, default=3.0, help="durée du zoom surprise avant retour")
+    ap.add_argument("--son-clip", type=float, default=0.12, help="volume du son du clip en fond (0 = coupé)")
     ap.add_argument("--texte2", default="UN ALLIGATOR ?!")
     ap.add_argument("--titre", default="N°1 — Un alligator dans la piscine ?!")
     a = ap.parse_args()
@@ -134,10 +135,21 @@ def main():
     masque_tv = Image.new("L", cadre_tv.size, 0)
     ImageDraw.Draw(masque_tv).rounded_rectangle((0, 0, cadre_tv.width - 1, cadre_tv.height - 1), 22, fill=255)
 
-    ff = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
-                           "-r", str(FPS), "-i", "-", "-i", a.audio, "-map", "0:v", "-map", "1:a", "-shortest",
-                           "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
-                           a.sortie], stdin=subprocess.PIPE)
+    cmd = ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
+           "-r", str(FPS), "-i", "-", "-i", a.audio]
+    debut_son = None
+    if a.clip and a.son_clip > 0:
+        debut_son = min([p[0] for p in plan] or [a.clip_debut])
+    if debut_son is not None and debut_son < duree:      # son du clip en fond, en boucle, sous la voix
+        ms = int(debut_son * 1000)
+        cmd += ["-stream_loop", "-1", "-i", a.clip, "-filter_complex",
+                f"[2:a]aresample=44100,volume={a.son_clip},adelay={ms}|{ms}[f];"
+                f"[1:a]aresample=44100[v];[v][f]amix=inputs=2:duration=first:normalize=0[a]",
+                "-map", "0:v", "-map", "[a]"]
+    else:
+        cmd += ["-map", "0:v", "-map", "1:a"]
+    ff = subprocess.Popen(cmd + ["-t", f"{duree:.2f}", "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
+                                 "-c:a", "aac", "-b:a", "192k", a.sortie], stdin=subprocess.PIPE)
     for i in range(N):
         t = i / FPS
         _, img, msk = [p for p in postures if p[0] <= t][-1]
@@ -151,8 +163,8 @@ def main():
         tv = image_tele(t)
         cadre = decor.copy()
         # Sunny : respiration + balancement
-        resp = 1 + 0.006 * math.sin(2 * math.pi * t / 3.2)
-        dx = 6 * math.sin(2 * math.pi * t / 4.5)
+        resp = 1 + 0.003 * math.sin(2 * math.pi * t / 3.2)
+        dx = 3 * math.sin(2 * math.pi * t / 4.5)
         s_img = Image.fromarray(sunny[:a.bas].clip(0, 255).astype(np.uint8)).resize((wS, int(hS * resp)))
         s_m = Image.fromarray((msk[:a.bas] * 255).astype(np.uint8)).resize((wS, int(hS * resp)))
         sursaut = 0
