@@ -9,3 +9,5 @@ __pycache__/
 !voix/echantillons/*.mp3
 !studio/avatar/bibliotheque/*.mp4
 !studio/avatar/bibliotheque/*.wav
+!videos/demo/*.mp4
+!videos/demo/*.wav

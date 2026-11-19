@@ -11,6 +11,7 @@
 import argparse
 import math
 import subprocess
+from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -32,9 +33,26 @@ def lire_video(chemin):
     return np.frombuffer(brut, np.uint8).reshape(-1, h, w, 3)
 
 
-def detourer(img):
+def detourer(img, bras=None):
+    """Détourage de Sunny ; `bras` = segments du bras tendu (souvent coupé par le détourage), ajoutés s'ils
+    sont couleur peau."""
+    import cv2
     from rembg import new_session, remove
-    return remove(img, session=new_session("u2net_human_seg"), only_mask=True, post_process_mask=True)
+    m = np.asarray(remove(img, session=new_session("u2net_human_seg"), only_mask=True, post_process_mask=True))
+    if bras:
+        zone = Image.new("L", img.size, 0); dz = ImageDraw.Draw(zone)
+        for p1, p2 in zip(bras, bras[1:]):
+            dz.line([p1, p2], fill=255, width=96)
+        hsv = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2HSV).astype(int)
+        peau = ((hsv[..., 0] <= 22) | (hsv[..., 0] >= 172)) & (hsv[..., 1] > 55) & (hsv[..., 2] > 70)
+        ajout = (np.asarray(zone) > 0) & peau
+        ajout = cv2.morphologyEx(ajout.astype(np.uint8) * 255, cv2.MORPH_CLOSE, np.ones((9, 9), np.uint8))
+        ajout = cv2.morphologyEx(ajout, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+        m = np.maximum(m, cv2.GaussianBlur(ajout, (0, 0), 1.5))
+    return Image.fromarray(m)
+
+
+BRAS_TENDUS = {"montre": [(645, 480), (800, 500), (905, 470)]}
 
 
 def main():
@@ -58,13 +76,18 @@ def main():
     for item in a.postures.split(","):
         t, chemin = item.split(":", 1)
         im = Image.open(chemin).convert("RGB")
-        postures.append((float(t), np.asarray(im, np.float32), np.asarray(detourer(im), np.float32) / 255))
+        bras = next((v for k, v in BRAS_TENDUS.items() if k in Path(chemin).name), None)
+        postures.append((float(t), np.asarray(im, np.float32), np.asarray(detourer(im, bras), np.float32) / 255))
     postures.sort(key=lambda p: p[0])
 
     decor = Image.open(a.decor).convert("RGB")
     tele = Image.open(a.tele).convert("RGB")
     f = ImageFont.truetype(FONT, 46); grand = ImageFont.truetype(FONT, 150)
     hS = 1000; wS = int(896 * hS / 1344)                       # Sunny dans le studio
+    X_SUNNY = TV[0] + 22 - wS                                  # le bord droit de son image touche la télé
+    cadre_tv = decor.crop((TV[0] - 28, TV[1] - 28, TV[0] + TV[2] + 28, TV[1] + TV[3] + 28))
+    masque_tv = Image.new("L", cadre_tv.size, 0)
+    ImageDraw.Draw(masque_tv).rounded_rectangle((0, 0, cadre_tv.width - 1, cadre_tv.height - 1), 22, fill=255)
 
     ff = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
                            "-r", str(FPS), "-i", "-", "-i", a.audio, "-map", "0:v", "-map", "1:a", "-shortest",
@@ -86,7 +109,7 @@ def main():
         cw, ch = int(tele.width / z), int(tele.height / z)
         tv = tele.crop(((tele.width - cw) // 2, (tele.height - ch) // 2, (tele.width + cw) // 2,
                         (tele.height + ch) // 2)).resize((tw, th))
-        cadre = decor.copy(); cadre.paste(tv, TV[:2])
+        cadre = decor.copy()
         # Sunny : respiration + balancement
         resp = 1 + 0.006 * math.sin(2 * math.pi * t / 3.2)
         dx = 6 * math.sin(2 * math.pi * t / 4.5)
@@ -96,7 +119,13 @@ def main():
         if t >= a.surprise:                                    # petit saut au moment de la surprise
             u = t - a.surprise
             sursaut = -int(28 * math.exp(-6 * u) * abs(math.sin(14 * u)))
-        cadre.paste(s_img, (int(60 + dx), H - s_img.height + 40 + sursaut), s_m)
+        cadre.paste(s_img, (int(X_SUNNY + dx), 110 + sursaut + (hS - s_img.height)), s_m)
+        # la télé passe devant (le bras tendu « entre » derrière l'écran), puis le bureau devant Sunny
+        cadre.paste(cadre_tv, (TV[0] - 28, TV[1] - 28), masque_tv); cadre.paste(tv, TV[:2])
+        d = ImageDraw.Draw(cadre)
+        d.polygon([(110, 770), (760, 770), (800, 1000), (70, 1000)], fill=(30, 10, 55))
+        d.line([(110, 770), (760, 770)], fill=(255, 62, 154), width=8)
+        d.text((435, 880), "LEONIDA LIVE", font=ImageFont.truetype(FONT, 52), fill=(33, 212, 224), anchor="mm")
         # bandeau titre
         d = ImageDraw.Draw(cadre)
         d.rectangle((0, H - 110, W, H - 20), fill=(42, 15, 74)); d.rectangle((0, H - 110, 16, H - 20), fill=(255, 62, 154))
@@ -106,7 +135,7 @@ def main():
             u = t - a.surprise
             zoom = 1 + 0.35 * (1 - math.exp(-9 * u))
             sx = 14 * math.exp(-5 * u) * math.sin(55 * u); sy = 10 * math.exp(-5 * u) * math.cos(47 * u)
-            cx, cy = 420 + sx, 430 + sy                       # vers le visage de Sunny
+            cx, cy = X_SUNNY + 340 + sx, 400 + sy             # vers le visage de Sunny
             cw, ch = W / zoom, H / zoom
             x0 = min(max(0, cx - cw / 2), W - cw); y0 = min(max(0, cy - ch / 2), H - ch)
             cadre = cadre.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
