@@ -7,3 +7,5 @@ exports/
 __pycache__/
 !voix/references/*.wav
 !voix/echantillons/*.mp3
+!studio/avatar/bibliotheque/*.mp4
+!studio/avatar/bibliotheque/*.wav
