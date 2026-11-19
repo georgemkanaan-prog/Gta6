@@ -98,12 +98,6 @@ def main():
         z = a.zoom_clip; ch, cw = brut.shape[1:3]
         y0, x0 = int(ch * (1 - z) / 2), int(cw * (1 - z) / 2)
         clip = [Image.fromarray(fr[y0:ch - y0, x0:cw - x0]).resize((TV[2], TV[3]), Image.BICUBIC) for fr in brut]
-        if a.credit:
-            fc = ImageFont.truetype(FONT, 24)
-            for im in clip:
-                dc = ImageDraw.Draw(im); tw_ = dc.textlength(a.credit, font=fc)
-                dc.rectangle((TV[2] - tw_ - 36, TV[3] - 50, TV[2] - 12, TV[3] - 12), fill=(0, 0, 0))
-                dc.text((TV[2] - tw_ - 24, TV[3] - 45), a.credit, font=fc, fill=(255, 255, 255))
     if a.ralenti:
         r0, r1, rt = map(float, a.ralenti.split(","))
 
@@ -169,6 +163,16 @@ def main():
         # bas de l'image (short) posé sur le bandeau titre ; la respiration étire vers le haut
         cadre.paste(s_img, (int(X_SUNNY + dx), H - 110 - s_img.height + sursaut), s_m)
         cadre.paste(tv, TV[:2])
+        # crédit discret : petit, semi-transparent, 3 premières secondes de l'extrait seulement
+        debut_clip = plan[0][0] if plan else a.clip_debut
+        if a.credit and clip is not None and debut_clip <= t < debut_clip + 3:
+            fc = ImageFont.truetype(FONT, 16)
+            calque_c = Image.new("RGBA", cadre.size, (0, 0, 0, 0)); dc = ImageDraw.Draw(calque_c)
+            fondu = min(1.0, (t - debut_clip) / 0.3, (debut_clip + 3 - t) / 0.3)
+            tw_ = dc.textlength(a.credit, font=fc)
+            dc.text((TV[0] + TV[2] - tw_ - 14, TV[1] + TV[3] - 26), a.credit, font=fc,
+                    fill=(255, 255, 255, int(150 * fondu)))
+            cadre = Image.alpha_composite(cadre.convert("RGBA"), calque_c).convert("RGB")
         # bandeau titre
         d = ImageDraw.Draw(cadre)
         d.rectangle((0, H - 110, W, H - 20), fill=(42, 15, 74)); d.rectangle((0, H - 110, 16, H - 20), fill=(255, 62, 154))
