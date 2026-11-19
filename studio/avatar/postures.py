@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw, ImageFilter
 ICI = Path(__file__).parent
 MODELE = "Lykon/dreamshaper-xl-lightning"
 EPAULES = {"g": (245, 480), "d": (640, 480)}
-ANCIENS_BRAS = [[(245, 480), (190, 880), (80, 1290)], [(640, 480), (700, 870), (805, 1290)]]
+ANCIENS_BRAS = [[(240, 480), (175, 880), (70, 1300), (60, 1344)], [(645, 480), (725, 880), (825, 1300), (835, 1344)]]
 VISAGE = (335, 95, 575, 345)
 
 # chaque posture : coudes, poignets (gauche, droite), consigne
@@ -64,8 +64,8 @@ def main():
     # 1. anciens bras effacés (remplissage depuis le décor / le corps voisins)
     vieux = Image.new("L", (W, H), 0); dv = ImageDraw.Draw(vieux)
     for b in ANCIENS_BRAS:
-        tracer(dv, b[1:], 95)
-        dv.line([b[0], b[1]], fill=255, width=80)
+        tracer(dv, b[1:], 135)
+        dv.line([b[0], b[1]], fill=255, width=95)
     base = cv2.inpaint(np.array(img), np.array(vieux), 25, cv2.INPAINT_TELEA)
 
     # 2. nouveaux bras esquissés en couleur de peau (le haut du bras part de l'épaule d'origine)
