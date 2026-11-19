@@ -29,6 +29,12 @@ POSTURES = {
         "prompt": "both forearms raised forward at waist height, both hands open in front of her belly with palms up, "
                   "explaining gesture, slender feminine fingers, five fingers on each hand",
     },
+    "montre": {   # bras droit (côté droit de l'image) tendu vers la télé, main hors du cadre ; l'autre bras au repos
+        "bras": [[(240, 480), (175, 880), (70, 1300)], [(645, 480), (800, 500), (905, 470)]],
+        "mains": [(70, 1300), (905, 470)],
+        "prompt": "her left arm extended straight out to the side at shoulder height pointing out of the frame, "
+                  "her other arm relaxed down along her side",
+    },
     "surprise": {
         "bras": [[(245, 480), (150, 700), (190, 520)], [(640, 480), (745, 700), (705, 520)]],
         "mains": [(190, 520), (705, 520)],
