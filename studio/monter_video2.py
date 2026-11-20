@@ -84,7 +84,8 @@ def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=
     run(["ffmpeg", "-v", "error", "-y", "-i", w, "-ar", 16000, "-ac", 1, w16])
     run([PY_CB, RACINE / "studio/reutiliser_levres.py", "--biblio", RACINE / "studio/avatar/bibliotheque/sunny_portrait_01.mp4",
          "--biblio-audio", RACINE / "studio/avatar/bibliotheque/sunny_portrait_01.wav", "--audio", w16, "--sortie", vis])
-    args = [PY_IMG, RACINE / "studio/demo_reaction.py", "--visage", vis, "--audio", norm, "--sortie", sortie,
+    provisoire = sortie.with_name(sortie.stem + "_encours.mp4")   # renommé seulement si le rendu va au bout
+    args = [PY_IMG, RACINE / "studio/demo_reaction.py", "--visage", vis, "--audio", norm, "--sortie", provisoire,
             "--postures", f"0:{RACINE / 'studio/avatar/sunny_taille.png'}", "--bas", 1120, "--titre", titre,
             "--surprise", conv(surprise) if surprise is not None else 9999, "--surprise-duree", 2.6, "--texte2", texte2]
     if cartes:
@@ -98,6 +99,7 @@ def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=
             args += ["--credit", credit]
     OUT.mkdir(exist_ok=True)
     run(args, env={**os.environ, "U2NET_HOME": str(S / "u2net")})
+    provisoire.rename(sortie)
     return sortie
 
 
