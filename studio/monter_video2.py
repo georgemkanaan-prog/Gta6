@@ -71,6 +71,9 @@ def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=
     sortie = OUT / f"{nom}.mp4"
     if sortie.exists():
         return sortie
+    if not Path(voix).exists() or (clip is not None and not Path(clip).exists()):
+        print("en attente :", nom, flush=True)
+        return None
     print("partie", nom, flush=True)
     tmp = S / "parties"; tmp.mkdir(exist_ok=True)
     w = tmp / f"{nom}.wav"
@@ -173,6 +176,8 @@ def main():
         partie("18_defi_fin", V / "t10_fin.wav", "Le défi de Sunny", cartes=[(0, "fin.png")]),
         ecran_fin(OUT / "zz_fin_ecran.mp4"),
     ]
+    if any(p is None for p in sec):
+        print("parties manquantes : assemblage reporté"); return
     liste = S / "parties/liste.txt"
     # normalisation commune puis concaténation
     normes = []
