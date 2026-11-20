@@ -75,7 +75,19 @@ def main():
     ap.add_argument("--titre", default="N°1 — Un alligator dans la piscine ?!")
     a = ap.parse_args()
 
-    visage = lire_video(a.visage)
+    # visage animé lu image par image (le charger en entier coûte plusieurs Go)
+    vw, vh = map(int, subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                                      "stream=width,height", "-of", "csv=p=0", a.visage],
+                                     capture_output=True, text=True, check=True).stdout.strip().split(","))
+    lecteur = subprocess.Popen(["ffmpeg", "-v", "error", "-i", a.visage, "-r", str(FPS), "-f", "rawvideo",
+                                "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
+    derniere = [np.zeros((vh, vw, 3), np.uint8)]
+
+    def image_visage():
+        b = lecteur.stdout.read(vw * vh * 3)
+        if len(b) == vw * vh * 3:
+            derniere[0] = np.frombuffer(b, np.uint8).reshape(vh, vw, 3)
+        return derniere[0]
     duree = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
                                   a.audio], capture_output=True, text=True).stdout)
     N = int(duree * FPS)
@@ -170,8 +182,7 @@ def main():
         t = i / FPS
         _, img, msk = [p for p in postures if p[0] <= t][-1]
         # visage animé
-        v = Image.fromarray(visage[min(i, len(visage) - 1)]).resize((round(visage.shape[2] * ECH),
-                                                                      round(visage.shape[1] * ECH)), Image.LANCZOS)
+        v = Image.fromarray(image_visage()).resize((round(vw * ECH), round(vh * ECH)), Image.LANCZOS)
         calque = img.copy(); va = np.asarray(v, np.float32)
         hh, ww = min(1344 - DY, va.shape[0]), min(896 - DX, va.shape[1])
         calque[DY:DY + hh, DX:DX + ww] = va[:hh, :ww]
