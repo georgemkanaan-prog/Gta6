@@ -103,7 +103,7 @@ def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=
     return sortie
 
 
-def generique(sortie, d=4.0):
+def generique(sortie, d=6.0):
     if sortie.exists():
         return sortie
     fond = Image.open(RACINE / "studio/assets/studio.png").convert("RGB")
@@ -126,7 +126,7 @@ def generique(sortie, d=4.0):
     return sortie
 
 
-def ecran_fin(sortie, d=20.0):
+def ecran_fin(sortie, d=25.0):
     """Sunny silencieuse (respiration), carte « abonne-toi » dans la télé : zone pour l'écran de fin YouTube."""
     if sortie.exists():
         return sortie
