@@ -126,7 +126,7 @@ def generique(sortie, d=4.0):
     return sortie
 
 
-def ecran_fin(sortie, d=15.0):
+def ecran_fin(sortie, d=20.0):
     """Sunny silencieuse (respiration), carte « abonne-toi » dans la télé : zone pour l'écran de fin YouTube."""
     if sortie.exists():
         return sortie
@@ -175,6 +175,7 @@ def main():
                plan=json.loads((S / "parties/top3_plan.json").read_text()) if (S / "parties/top3_plan.json").exists() else [],
                surprise=json.loads((S / "parties/top3_surprise.json").read_text()) if (S / "parties/top3_surprise.json").exists() else None,
                texte2="NUMÉRO 1 !"),
+        partie("17b_question", V / "t09e_question.wav", "Question du jour : Lucia ou Jason ?", cartes=[(0, "personnages.png")]),
         partie("18_defi_fin", V / "t10_fin.wav", "Le défi de Sunny", cartes=[(0, "fin.png")]),
         ecran_fin(OUT / "zz_fin_ecran.mp4"),
     ]
