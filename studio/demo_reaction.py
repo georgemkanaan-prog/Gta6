@@ -115,26 +115,30 @@ def main():
 
     clip = None
     if a.clip:
-        # seuls les morceaux utilisés par le plan sont décodés, recadrés et réduits par ffmpeg (peu de mémoire)
+        # décodage paresseux : seul le morceau en cours de diffusion est gardé en mémoire
         z = a.zoom_clip
         filtre = f"crop=iw*{z}:ih*{z},scale={TV[2]}:{TV[3]},fps={FPS}"
-        morceaux = ([(0, 0.1)] + [(c0, c1) for _, c0, c1, _ in plan]) if plan else [(0, 1e6)]   # + 1re image (avant le plan)
-        clip = {}
-        for c0, c1 in morceaux:
-            brut = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{c0:.3f}", "-to", f"{c1 + 0.1:.3f}", "-i", a.clip,
-                                   "-vf", filtre, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
-                                  capture_output=True, check=True).stdout
-            fr = np.frombuffer(brut, np.uint8).reshape(-1, TV[3], TV[2], 3)
-            for k in range(len(fr)):
-                clip[int(round(c0 * FPS)) + k] = Image.fromarray(fr[k])
+        morceaux = ([(0, 0.1)] + [(c0, c1) for _, c0, c1, _ in plan]) if plan else [(0, 1e6)]
+        cache = {"cle": None, "debut": 0, "images": None}
+
+        def charger(c0, c1):
+            if cache["cle"] != (c0, c1):
+                brut = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{c0:.3f}", "-to", f"{c1 + 0.1:.3f}", "-i", a.clip,
+                                       "-vf", filtre, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                                      capture_output=True, check=True).stdout
+                cache.update(cle=(c0, c1), debut=int(round(c0 * FPS)),
+                             images=np.frombuffer(brut, np.uint8).reshape(-1, TV[3], TV[2], 3))
+            return cache
+        clip = morceaux
     if a.ralenti:
         r0, r1, rt = map(float, a.ralenti.split(","))
 
     def trame(k):
-        if k in clip:
-            return clip[k]
-        cles = sorted(clip)
-        return clip[min(cles, key=lambda c: abs(c - k))]
+        t = k / FPS
+        c0, c1 = next(((c0, c1) for c0, c1 in clip if c0 - 0.05 <= t <= c1 + 0.1), min(clip, key=lambda m: abs(m[0] - t)))
+        cc = charger(c0, c1)
+        i = min(len(cc["images"]) - 1, max(0, k - cc["debut"]))
+        return Image.fromarray(cc["images"][i])
 
     def image_tele(t):
         if clip is not None and plan and t >= plan[0][0]:
