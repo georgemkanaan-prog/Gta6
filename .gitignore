@@ -19,3 +19,5 @@ videos/003-secrets/extraits/
 videos/003-secrets/*.mp4
 videos/003-secrets/parties/
 videos/shorts/*.mp4
+!livraison/*.mp4
+!livraison/*.png
