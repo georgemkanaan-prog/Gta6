@@ -103,14 +103,14 @@ def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=
     return sortie
 
 
-def generique(sortie, d=6.0):
+def generique(sortie, d=6.0, jingle=None):
     if sortie.exists():
         return sortie
     fond = Image.open(RACINE / "studio/assets/studio.png").convert("RGB")
     f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 150)
     proc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", "1920x1080",
-                             "-r", str(FPS), "-i", "-", "-f", "lavfi", "-i",
-                             f"aevalsrc='0.25*sin(2*PI*(220+110*floor(t*4))*t)*exp(-3*mod(t,0.25))':s={SR}:d={d}",
+                             "-r", str(FPS), "-i", "-"] + (["-i", str(jingle)] if jingle else ["-f", "lavfi", "-i",
+                             f"aevalsrc='0.25*sin(2*PI*(220+110*floor(t*4))*t)*exp(-3*mod(t,0.25))':s={SR}:d={d}"]) + [
                              "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", sortie],
                             stdin=subprocess.PIPE)
     for i in range(int(d * FPS)):
