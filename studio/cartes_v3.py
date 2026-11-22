@@ -55,3 +55,20 @@ d.text((520, 30), "ŒUF", font=f(150), fill=JAUNE, stroke_width=12, stroke_fill=
 d.text((520, 175), "GÉANT ?!", font=f(120), fill=(255, 255, 255), stroke_width=12, stroke_fill=NUIT)
 mini.save(out.parent / "miniature_video3.png")
 print("ok")
+
+# cartes ajoutées (rallonge à 8 min)
+im = fond(); d = ImageDraw.Draw(im); bandeau(d, "FLASH SPÉCIAL", (220, 30, 40))
+centre(d, 280, "RECRUTEMENT À GRASSRIVERS", 62, JAUNE, 6)
+centre(d, 400, "Expédition de nuit dans les marais", 44); centre(d, 460, "Fourni : lampe torche + courage", 44)
+d.rectangle((0, H - 80, W, H), fill=(220, 30, 40))
+d.text((30, H - 40), "ODEUR NON COMPRISE • INFO LEONIDA LIVE", font=f(30), fill=(255, 255, 255), anchor="lm")
+im.save(out / "flash2.png")
+
+im = fond(); d = ImageDraw.Draw(im); bandeau(d, "LE SAVIEZ-VOUS ? — TRADITION GTA", TURQ)
+for i, (a, b) in enumerate([("GTA 5", "Bigfoot + OVNI au-dessus du mont Chiliad"), ("GTA 6", "Skunk Ape + soucoupe à Port Gellhorn")]):
+    y = 200 + i * 220
+    d.rounded_rectangle((90, y, W - 90, y + 170), 24, fill=NUIT, outline=ROSE, width=4)
+    d.text((130, y + 55), a, font=f(52), fill=JAUNE, anchor="lm")
+    d.text((130, y + 120), b, font=f(40), fill=(255, 255, 255), anchor="lm")
+im.save(out / "tradition.png")
+print("cartes ajoutées")
