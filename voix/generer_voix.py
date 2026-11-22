@@ -75,7 +75,7 @@ def main():
     ap.add_argument("--voix", choices=VOIX, required=True)
     ap.add_argument("--sortie", required=True)
     ap.add_argument("--graine", type=int, default=1)
-    ap.add_argument("--prises", type=int, default=3, help="prises par phrase ; la plus fidèle au texte est gardée")
+    ap.add_argument("--prises", type=int, default=1, help="prises par phrase (règle : 1 ; segment raté → refaire ce segment seul)")
     a = ap.parse_args()
 
     v = VOIX[a.voix]
