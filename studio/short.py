@@ -25,17 +25,27 @@ def ass_temps(s):
     return f"{int(h)}:{int(m):02d}:{r:05.2f}"
 
 
-def sous_titres(audio, sortie, mots_par_ligne=3):
+def sous_titres(audio, sortie, mots_par_ligne=3, script=None):
     from faster_whisper import WhisperModel
     pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", audio, "-ac", "1", "-ar", "16000", "-f", "f32le", "-"],
                          capture_output=True, check=True).stdout
     segs, _ = WhisperModel("small", device="cpu", compute_type="int8").transcribe(
         np.frombuffer(pcm, np.float32), language="fr", word_timestamps=True)
     mots = [w for s in segs for w in s.words]
+    ecrit = [w.word.strip() for w in mots]
+    if script:   # orthographe du script (exacte) posée sur les instants de la transcription
+        import difflib
+        ref = script.split()
+        n = lambda x: unicodedata.normalize("NFKD", x.lower()).encode("ascii", "ignore").decode().strip(".,!?…:;'\"«»")
+        sm = difflib.SequenceMatcher(None, [n(w) for w in ecrit], [n(w) for w in ref], autojunk=False)
+        for tag, i1, i2, j1, j2 in sm.get_opcodes():
+            if tag == "equal" or (tag == "replace" and i2 - i1 == j2 - j1):
+                for k in range(i2 - i1):
+                    ecrit[i1 + k] = ref[j1 + k]
     lignes = []
     for i in range(0, len(mots), mots_par_ligne):
         g = mots[i:i + mots_par_ligne]
-        txt = " ".join(w.word.strip() for w in g).upper()
+        txt = " ".join(ecrit[i:i + mots_par_ligne]).upper()
         fin = mots[i + mots_par_ligne].start if i + mots_par_ligne < len(mots) else g[-1].end + 0.4
         lignes.append(f"Dialogue: 0,{ass_temps(g[0].start)},{ass_temps(fin)},Mot,,0,0,0,,{txt}")
     entete = """[Script Info]
@@ -57,6 +67,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sortie", required=True); ap.add_argument("--titre", required=True)
     ap.add_argument("--passage", action="append", required=True, help="fichier:debut:fin (secondes)")
+    ap.add_argument("--texte", action="append", default=[], help="fichier(s) texte du script : orthographe des sous-titres")
     a = ap.parse_args()
     tmp = Path(tempfile.mkdtemp())
     morceaux = []
@@ -71,7 +82,8 @@ def main():
     brut = tmp / "brut.mp4"
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(tmp / "l.txt"), "-c", "copy",
                     str(brut)], check=True)
-    sous_titres(str(brut), tmp / "st.ass")
+    script = " ".join(Path(t).read_text(encoding="utf-8") for t in a.texte) or None
+    sous_titres(str(brut), tmp / "st.ass", script=script)
     tx, ty, tw, th = TV; sx, sy, sw, sh = SUNNY
     titre = a.titre.replace("'", "’").replace(":", "\\:")
     font = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
