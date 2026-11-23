@@ -21,3 +21,7 @@ videos/003-secrets/parties/
 videos/shorts/*.mp4
 !livraison/*.mp4
 !livraison/*.png
+videos/004-moments-fous/brut/
+videos/004-moments-fous/extraits/
+videos/004-moments-fous/parties/
+videos/004-moments-fous/*.mp4
