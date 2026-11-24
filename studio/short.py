@@ -32,16 +32,38 @@ def sous_titres(audio, sortie, mots_par_ligne=3, script=None):
     segs, _ = WhisperModel("small", device="cpu", compute_type="int8").transcribe(
         np.frombuffer(pcm, np.float32), language="fr", word_timestamps=True)
     mots = [w for s in segs for w in s.words]
-    ecrit = [w.word.strip() for w in mots]
-    if script:   # orthographe du script (exacte) posée sur les instants de la transcription
+    if script:   # mots EXACTS du script, chacun daté par alignement lettre à lettre sur la transcription
         import difflib
+        n = lambda x: "".join(c for c in unicodedata.normalize("NFKD", x.lower()).encode("ascii", "ignore").decode() if c.isalnum())
+        W, tw = [], []
+        for w in mots:
+            l = n(w.word)
+            for k, c in enumerate(l):
+                W.append(c); tw.append(w.start + (w.end - w.start) * k / max(len(l), 1))
         ref = script.split()
-        n = lambda x: unicodedata.normalize("NFKD", x.lower()).encode("ascii", "ignore").decode().strip(".,!?…:;'\"«»")
-        sm = difflib.SequenceMatcher(None, [n(w) for w in ecrit], [n(w) for w in ref], autojunk=False)
-        for tag, i1, i2, j1, j2 in sm.get_opcodes():
-            if tag == "equal" or (tag == "replace" and i2 - i1 == j2 - j1):
-                for k in range(i2 - i1):
-                    ecrit[i1 + k] = ref[j1 + k]
+        R, debut = [], []
+        for w in ref:
+            debut.append(len(R)); R.extend(n(w) or "_")
+        carte = [None] * len(R)
+        for a, b, size in difflib.SequenceMatcher(None, R, W, autojunk=False).get_matching_blocks():
+            for k in range(size):
+                carte[a + k] = tw[b + k]
+        connus = [(i, x) for i, x in enumerate(carte) if x is not None]
+        def temps(i):
+            if carte[i] is not None:
+                return carte[i]
+            av = [c for c in connus if c[0] < i][-1:] or [(0, mots[0].start)]
+            ap = [c for c in connus if c[0] > i][:1] or [(len(R), mots[-1].end)]
+            (i0, t0), (i1, t1) = av[0], ap[0]
+            return t0 + (t1 - t0) * (i - i0) / max(i1 - i0, 1)
+        dates = [temps(d) for d in debut]
+        for k in range(1, len(dates)):
+            dates[k] = max(dates[k], dates[k - 1] + 0.05)
+        fin_audio = mots[-1].end
+        mots = [type("M", (), {"start": d, "end": (dates[k + 1] if k + 1 < len(dates) else fin_audio)})() for k, d in enumerate(dates)]
+        ecrit = ref
+    else:
+        ecrit = [w.word.strip() for w in mots]
     lignes = []
     for i in range(0, len(mots), mots_par_ligne):
         g = mots[i:i + mots_par_ligne]
