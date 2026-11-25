@@ -58,6 +58,7 @@ def main():
     RECC = clip_plus_carte(REC, "guide_receleurs.png", 9, X / "receleurs_carte.mp4")
     GARC = clip_plus_carte(GAR, "guide_garages.png", 9, X / "garages_carte.mp4")
     POUC = clip_plus_carte(POU, "guide_pousser.png", 9, X / "pousser_carte.mp4")
+    CHEC = clip_plus_carte(CHE, "guide_cheats.png", 9, X / "cheats_carte.mp4")
     dta, dtb, dtc = duree(TA), duree(TB), duree(TC)
     sec = [
         p("01_accroche", "c01_accroche", clip=TC, credit="Clip : mrdalekjd",
@@ -72,8 +73,8 @@ def main():
           gaps=[(99, 8.0)], plan=[(0, 0.0, duree(GARC) - 0.1, -1)], son=0.12),
         p("06_pousser", "c05_pousser", titre="N°5 : tu peux pousser les voitures", clip=POUC, credit=GX,
           gaps=[(99, 8.0)], plan=[(0, 0.0, duree(POUC) - 0.1, -1)], son=0.12),
-        p("07_cheats", "c06_cheats", titre="N°4 : comment marchent les codes de triche", clip=CHE, credit=GX,
-          gaps=[(99, 4.0)], plan=[(0, 0.0, duree(CHE) - 0.1, -1)], son=0.12),
+        p("07_cheats", "c06_cheats", titre="N°4 : comment marchent les codes de triche", clip=CHEC, credit=GX,
+          gaps=[(99, 8.0)], plan=[(0, 0.0, duree(CHEC) - 0.1, -1)], son=0.0),
         p("08_bugatti", "c07_bugatti", titre="N°3 : quelle Bugatti est-ce vraiment ?", clip=BUG,
           credit="Clip : lbmms_", gaps=[(99, 2.0)], plan=[(0, 0.0, duree(BUG) - 0.1, -1)], son=0.12),
         p("08b_bugatti_ou", "c07b_bugatti_ou", titre="N°3 : où trouver la Bugatti ?", cartes=[(0, "bugatti.png")]),

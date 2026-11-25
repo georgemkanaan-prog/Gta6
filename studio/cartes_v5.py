@@ -26,6 +26,8 @@ liste("COMMENT FAIRE — GARAGES", ["1. Ouvre ton téléphone", "2. Appli immobi
                                   "3. Achète un garage près de l'action", "Manoirs et villas : liés à l'histoire"], "guide_garages.png")
 liste("COMMENT FAIRE — POUSSER", ["1. Devant ou derrière la voiture", "2. Continue d'avancer : tu pousses",
                                   "3. Maintiens le bouton affiché", "Grosse poussée !"], "guide_pousser.png")
+liste("COMMENT FAIRE — TRICHES", ["1. Menu pause → Progression → Triches", "2. Débloque-les en avançant (cadenas)",
+      "3. Téléphone + touche + combinaison", "Jamais de site qui demande ton mot de passe"], "guide_cheats.png", TURQ, 36)
 liste("COMMENT LE TROUVER — BLINDÉ (1/2)", ["1. Monument Friends of Freedom (est du centre)",
       "2. Appartement à Little Cuba (drapeau cubain)", "3. Photo : Sharktooth Island", "4. Porte du bunker : 01 03 17"],
       "guide_tank1.png", TURQ, 34)
