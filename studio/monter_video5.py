@@ -79,7 +79,7 @@ def main():
           credit="Clip : lbmms_", gaps=[(99, 2.0)], plan=[(0, 0.0, duree(BUG) - 0.1, -1)], son=0.12),
         p("08b_bugatti_ou", "c07b_bugatti_ou", titre="N°3 : où trouver la Bugatti ?", cartes=[(0, "bugatti.png")]),
         p("09_abonne", "c08_abonne", titre="Abonne-toi : une vidéo GTA 6 tous les jours", cartes=[(0, "fin.png")]),
-        p("10_tank", "c09_tank", titre="N°1 : le blindé gratuit pour toujours", clip=TA, credit="Clip : mrdalekjd",
+        p("10_tank", "c09_tank", titre="N°2 et N°1 : le blindé gratuit pour toujours", clip=TA, credit="Clip : mrdalekjd",
           plan=[(0, 0.0, 10.5, -1)], son=0.10),
         p("11_tank1", "c10_tank_etapes1", titre="Guide : le blindé gratuit (étapes 1 à 3)", clip=TA,
           credit="Clip : mrdalekjd", gaps=[(99, 2.0)], plan=[(0, 10.5, dta - 0.1, -1)], son=0.10),
