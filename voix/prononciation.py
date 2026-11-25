@@ -2,6 +2,7 @@
 import re
 
 PRONONCIATION = {
+    r"\btank\b": "tanque",
     r"\blbmms_": "L B M M S",
     r"\bmrdalekjd\b": "Mister Dalek J D",
     r"\bgameranx\b": "Gamer-anx",
