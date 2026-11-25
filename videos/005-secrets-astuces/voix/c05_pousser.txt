@@ -1,0 +1,1 @@
+Numéro cinq : une mécanique cachée. Tu peux pousser les voitures ! Mets-toi devant ou derrière un véhicule, et continue d'avancer : ton personnage commence à pousser, et la voiture avance doucement. Ensuite, un bouton apparaît à l'écran : maintiens-le, et ton personnage donne une grosse poussée. Parfait pour dégager une voiture qui bloque ton garage… ou pour embêter les voisins.

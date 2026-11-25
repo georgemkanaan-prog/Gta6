@@ -2,6 +2,19 @@
 import re
 
 PRONONCIATION = {
+    r"\blbmms_": "L B M M S",
+    r"\bmrdalekjd\b": "Mister Dalek J D",
+    r"\bgameranx\b": "Gamer-anx",
+    r"\blevivdwaarden\b": "Lévi Vé Dé Ouarden",
+    r"\bSharktooth Island\b": "Charke-touce Aïlande",
+    r"\bWest Vice Dale\b": "Ouest Vaïce Dèle",
+    r"\bCold War 556\b": "Cold Ouar cinq cent cinquante-six",
+    r"\bRusso 1922\b": "Russo mille neuf cent vingt-deux",
+    r"\bTourbillon\b": "Tourbillon",
+    r"\bChiron\b": "Chi-ronne",
+    r"\bDivo\b": "Divo",
+    r"\bJason\b": "Djeïsonne",
+    r"\bLucia\b": "Loucia",
     r"\bLeonida Live\b": "Léonida Laïve",
     r"\bLeonida\b": "Léonida",
     r"\bVice City\b": "Vaïce Citi",
