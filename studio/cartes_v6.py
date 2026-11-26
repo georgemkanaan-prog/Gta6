@@ -35,6 +35,19 @@ liste("COMMENT LA TROUVER — SUPERCAR", ["1. Quartiers résidentiels de Capri",
 liste("INFOS DE JOUEURS (À VÉRIFIER)", ["Traceur avancé sur la supercar ?", "La plus rapide : la Thrax ?",
       "Répare ta voiture aux pompes à essence"], "commentaires.png", ORANGE, 38)
 
+liste("ESSAYER FIVEM SANS TE FAIRE AVOIR", ["1. Un PC + GTA 5 officiel", "2. FiveM : site officiel uniquement",
+      "3. Un serveur francophone, lis les règles", "Ne paie jamais un inconnu"], "essayer.png", TURQ, 36)
+liste("LE RP SUR GTA 6 ?", ["2023 : Rockstar rachète l'équipe de FiveM", "Rien d'annoncé pour GTA 6",
+      "Un signe pour beaucoup de joueurs", "Si ça arrive : vidéo le jour même !"], "rockstar.png", ORANGE, 36)
+liste("RÉCAP", ["FiveM : le RP, des serveurs à l'infini", "… mais PC, mods et patience",
+      "GTA 6 : monde neuf, histoire, secrets", "… et ça marche tout de suite"], "recap.png", ROSE, 38)
+im = fond(); d = ImageDraw.Draw(im); bandeau(d, "FLASH SPÉCIAL", ROUGE)
+centre(d, 280, "ALERTE LUMIÈRE DU JOUR", 70, JAUNE, 6)
+centre(d, 400, "Un joueur FiveM aperçu dehors", 46); centre(d, 460, "pour la première fois depuis des années", 40)
+d.rectangle((0, H - 80, W, H), fill=ROUGE)
+d.text((30, H - 40), "INFO LEONIDA LIVE • GTA 6 AVEC MODÉRATION", font=f(30), fill=(255, 255, 255), anchor="lm")
+im.save(out / "flash.png")
+
 im = fond(); d = ImageDraw.Draw(im); bandeau(d, "LE VERDICT DE SUNNY")
 for i, (t, s) in enumerate([("GTA 6", "pour l'aventure"), ("FIVEM", "pour les potes")]):
     x = 140 + i * 520
