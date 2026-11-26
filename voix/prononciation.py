@@ -2,6 +2,19 @@
 import re
 
 PRONONCIATION = {
+    r"\bFiveM\b": "Faïve-Emme",
+    r"\bDarkViperAU\b": "Dark Vaïpeur A U",
+    r"\bTJRmindset\b": "T J R Maïnde-sète",
+    r"\bKing Jay\b": "King Djé",
+    r"\bRevolution Development\b": "Révolution Divélopmeunte",
+    r"\bChromatix\b": "Chromatix",
+    r"\bRed Dead Redemption 2\b": "Rède Dède Rédemmpcheune deux",
+    r"\bsiidv2\b": "Sid V deux",
+    r"\bThrax\b": "Thraxe",
+    r"\bRandy\b": "Rennedi",
+    r"\bLos Santos\b": "Losse Sanntosse",
+    r"\bGTA RP\b": "Gé Té A R P",
+    r"\bINTER\b": "Inteur",
     r"\btank\b": "tanque",
     r"\blbmms_": "L B M M S",
     r"\bmrdalekjd\b": "Mister Dalek J D",
