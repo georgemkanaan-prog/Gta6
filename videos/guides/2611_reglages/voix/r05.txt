@@ -1,0 +1,1 @@
+Attention à une idée reçue : couper le flou ne fait pas gagner d'images par seconde. Selon plusieurs guides, GTA 6 tourne à trente images par seconde sur toutes les consoles, sans mode performance. C'est pour ça que certains joueurs gardent un tout petit peu de flou : ça rend les trente images plus douces. Pas de bonne ou de mauvaise réponse, teste les deux.

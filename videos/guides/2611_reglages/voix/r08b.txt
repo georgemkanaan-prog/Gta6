@@ -1,0 +1,1 @@
+Pour être précise sur les caméras cinématiques : un guide conseille de baisser la fréquence du plan cinématique de tir final, et celle des caméras d'accident de voiture, de trois à zéro ou un. Résultat : moins de ralentis imposés, et tu gardes le contrôle de ta caméra au moment où ça compte.

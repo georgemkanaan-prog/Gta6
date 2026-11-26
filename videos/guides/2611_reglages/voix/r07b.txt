@@ -1,0 +1,1 @@
+Dans le même onglet, pense à la caméra des véhicules. Un guide conseille de mettre la hauteur de caméra, pour tous les véhicules, sur haute : tu vois mieux la circulation devant toi. Un autre propose moyenne ou haute, selon la quantité de route que tu veux voir. Et l'onglet caméra contient aussi des options de confort, comme le balancement de l'arme.

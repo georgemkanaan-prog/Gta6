@@ -170,6 +170,9 @@ def miniature(G, sortie):
     import demo_reaction as dr
     from cartes_guide import icone, COULEURS, NUIT
     dec = Image.open(m2.DECOR).convert("RGB").resize((1280, 720)).filter(ImageFilter.GaussianBlur(3))
+    from cartes_guide import fond as fond_carte
+    ecran = fond_carte().resize((640, 360))                      # remplit l'écran noir du décor
+    dec.paste(ecran, (547, 100))
     s = Image.open(RACINE / "studio/avatar/sunny_taille.png").convert("RGB")
     m = dr.detourer(s, None); m = m if isinstance(m, Image.Image) else Image.fromarray(np.asarray(m).astype("uint8"))
     hs = 700; ws = int(896 * hs / 1120)
@@ -195,7 +198,7 @@ def hms(t):
     t = int(t); return f"{t // 60}:{t % 60:02d}"
 
 
-def publier(date, guides, jour_pub=None, heures=("18:00", "20:00"), heures_shorts=("12:00", "16:00")):
+def publier(date, guides, jour_pub=None, heures=("18:00", "20:00"), heures_shorts=("12:00", "16:00", "14:00 (bonus)", "22:00 (bonus)")):
     """Écrit livraison/publication_JJMM.md (JJMM = jour de livraison) ; planning proposé pour `jour_pub` (JJMM)."""
     jj, mm = (jour_pub or date)[:2], (jour_pub or date)[2:]
     L = [f"# Livraison du {date[:2]}/{date[2:]} — Leonida Live (guides GTA 6) · publication proposée le {jj}/{mm}", "",

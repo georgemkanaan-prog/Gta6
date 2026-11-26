@@ -1,0 +1,1 @@
+Ma méthode pour Moses, en trois gestes. Un : scanne plusieurs voitures avant d'en choisir une, au lieu de prendre la première venue. Deux : vérifie sur la fiche WAiNK sa valeur, et qu'elle n'a pas de traceur. Trois : conduis prudemment jusqu'à Moses, parce que chaque rayure te coûte une partie du bonus d'état.

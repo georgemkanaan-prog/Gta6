@@ -1,0 +1,1 @@
+Réglage numéro un, le plus conseillé de tous : le flou de mouvement. Tu le trouves dans l'affichage, partie effets visuels. Par défaut, quand tu tournes la caméra vite, l'image devient pâteuse. La plupart des guides conseillent de le mettre à zéro, ou le plus bas possible. Si tu préfères un rendu plus cinéma, un guide propose deux ou trois.

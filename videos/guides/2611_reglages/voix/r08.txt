@@ -1,0 +1,1 @@
+Si tu as facilement mal au cœur devant un jeu, voici le combo conseillé : balancement de caméra à zéro, et flou de mouvement à zéro, ou à un si zéro te paraît saccadé. Certains guides proposent aussi de réduire les caméras cinématiques, celles qui se déclenchent pendant un accident ou un tir final. Ça évite les changements d'angle brutaux.
