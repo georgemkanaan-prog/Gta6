@@ -36,7 +36,7 @@ def clip_plus_carte(clip, carte, d, sortie):
     m2.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", clip, "-loop", "1", "-t", d, "-i", m2.C / carte,
             "-f", "lavfi", "-t", d, "-i", "anullsrc=r=44100:cl=stereo", "-filter_complex",
             "[0:a]aresample=44100,aformat=channel_layouts=stereo[a0];"
-            "[1:v]scale=1280:720,fps=30,setsar=1[c];[0:v][a0][c][2:a]concat=n=2:v=1:a=1[v][a]",
+            "[0:v]setsar=1[v0];[1:v]scale=1280:720,fps=30,setsar=1[c];[v0][a0][c][2:a]concat=n=2:v=1:a=1[v][a]",
             "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-crf", "19", "-pix_fmt", "yuv420p", "-c:a", "aac", sortie])
     return sortie
 
@@ -54,7 +54,7 @@ def p(nom, seg, **kw):
 def concat(a, b, sortie):
     if not sortie.exists():
         m2.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", a, "-i", b, "-filter_complex",
-                "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]", "-map", "[v]", "-map", "[a]",
+                "[0:v]setsar=1,fps=30[x];[1:v]setsar=1,fps=30[y];[x][0:a][y][1:a]concat=n=2:v=1:a=1[v][a]", "-map", "[v]", "-map", "[a]",
                 "-c:v", "libx264", "-crf", "19", "-pix_fmt", "yuv420p", "-c:a", "aac", sortie])
     return sortie
 
