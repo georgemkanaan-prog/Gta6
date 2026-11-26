@@ -66,6 +66,9 @@ def video_cartes(cartes, d, sortie):
     proc.stdin.close(); proc.wait()
 
 
+DECOR = None   # None : studio d'origine ; sinon chemin du décor (ex. studio/assets/studio_vc.png)
+
+
 def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=None, texte2="QUOI ?!",
            credit=None, son=0.15, zoom=1.0):
     sortie = OUT / f"{nom}.mp4"
@@ -87,6 +90,7 @@ def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=
     provisoire = sortie.with_name(sortie.stem + "_encours.mp4")   # renommé seulement si le rendu va au bout
     args = [PY_IMG, RACINE / "studio/demo_reaction.py", "--visage", vis, "--audio", norm, "--sortie", provisoire,
             "--postures", f"0:{RACINE / 'studio/avatar/sunny_taille.png'}", "--bas", 1120, "--titre", titre,
+            "--decor", DECOR or RACINE / "studio/assets/studio.png",
             "--surprise", conv(surprise) if surprise is not None else 9999, "--surprise-duree", 2.6, "--texte2", texte2]
     if cartes:
         cv = tmp / f"{nom}_cartes.mp4"
@@ -106,7 +110,7 @@ def partie(nom, voix, titre, gaps=(), clip=None, plan=(), cartes=None, surprise=
 def generique(sortie, d=6.0, jingle=None):
     if sortie.exists():
         return sortie
-    fond = Image.open(RACINE / "studio/assets/studio.png").convert("RGB")
+    fond = Image.open(DECOR or RACINE / "studio/assets/studio.png").convert("RGB")
     f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 150)
     proc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", "1920x1080",
                              "-r", str(FPS), "-i", "-"] + (["-i", str(jingle)] if jingle else ["-f", "lavfi", "-i",

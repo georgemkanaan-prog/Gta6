@@ -2,6 +2,18 @@
 import re
 
 PRONONCIATION = {
+    r"\bBuckMe\b": "Beuk-Mi",
+    r"\bWAiNK\b": "Ouéïnk",
+    r"\bMoses\b": "Mozès",
+    r"\bPay 'n' Spray\b": "Pé-ène-Sprè",
+    r"\bClonin' Keys, Makin' Gs\b": "Clonine Kiz, Mékine Djiz",
+    r"\bSave for the Future\b": "Sève for ze Fioutcheur",
+    r"\bThat's Where The Money Is\b": "Zats Ouère ze Mani Iz",
+    r"\bWestern Nightblade\b": "Ouesteurn Naïte-blède",
+    r"\bLombank\b": "Lombanque",
+    r"\bOcean Beach\b": "Ochène Biiche",
+    r"\bPayday Loan\b": "Pèï-dé Lône",
+    r"\bATM\b": "A T M",
     r"\bFiveM\b": "Faïve-Emme",
     r"\bDarkViperAU\b": "Dark Vaïpeur A U",
     r"\bTJRmindset\b": "T J R Maïnde-sète",
