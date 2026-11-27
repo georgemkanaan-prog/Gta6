@@ -118,7 +118,7 @@ GUIDE = {
          "cartes": [(None, "Mon itinéraire", "1 · STARFISH|ISLAND", "Thrax + Comet spéciale", "carte", "cyan"),
                     ("Capri", "Mon itinéraire", "2 · CAPRI", "Emerus Seaspray, peut-être la Vitello", "carte", "jaune"),
                     ("Gellhorn", "Mon itinéraire", "3 · GELLHORN", "Status RSX avec le cloneur", "carte", "rose")]},
-        {"id": "v17", "chapitre": "Récap", "pause": 1.0,
+        {"id": "v17", "chapitre": "Récap", "pause": 4.0,
          "texte": "Et toi, quelle est ta voiture préférée dans GTA 6 ? Dis-le-moi en commentaire, et si tu as trouvé un emplacement sûr, je le vérifie pour un prochain guide. Abonne-toi pour un guide GTA 6 par jour, en français. À demain sur Leonida Live, bisous !",
          "cartes": [(None, "Question du jour", "TA VOITURE|PRÉFÉRÉE ?", "Réponds en commentaire", "voiture", "rose"),
                     ("Abonne", "Leonida Live", "UN GUIDE|PAR JOUR", "Abonne-toi !", "ok", "rose")]},
