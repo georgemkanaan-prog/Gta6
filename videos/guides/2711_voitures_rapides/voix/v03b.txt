@@ -1,0 +1,1 @@
+Concrètement : approche-toi de la voiture, sors ton téléphone, ouvre WAiNK et scanne. La fiche de la voiture s'affiche, avec sa valeur de revente et son niveau de traceur. Les guides insistent : même deux voitures du même modèle peuvent avoir une valeur différente, alors scanne toujours avant de voler.
